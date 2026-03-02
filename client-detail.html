@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <title>ふららぼ - クライアント詳細 - Opus CRM</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/detail.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <div class="app">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar__logo">
+        <div class="sidebar__logo-icon">O</div>
+        <div>
+          <div class="sidebar__logo-text">Opus CRM</div>
+          <span class="sidebar__logo-sub">営業管理</span>
+        </div>
+      </div>
+      <nav class="sidebar__nav">
+        <span class="sidebar__section-label">メニュー</span>
+        <a href="index.html" class="nav-item">
+          <span class="nav-item__icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
+          ダッシュボード
+        </a>
+        <a href="leads.html" class="nav-item">
+          <span class="nav-item__icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+          リード管理
+        </a>
+        <a href="clients.html" class="nav-item is-active">
+          <span class="nav-item__icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+          クライアント
+        </a>
+        <a href="tasks.html" class="nav-item">
+          <span class="nav-item__icon"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+          タスク
+        </a>
+        <span class="sidebar__section-label">その他</span>
+        <a href="settings.html" class="nav-item">
+          <span class="nav-item__icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+          設定
+        </a>
+      </nav>
+      <div class="sidebar__footer">
+        <div class="sidebar__user">
+          <div class="sidebar__avatar">上</div>
+          <div>
+            <div class="sidebar__user-name">上田 琉</div>
+            <div class="sidebar__user-role">管理者</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main -->
+    <main class="main">
+      <header class="page-header">
+        <div class="page-header__left">
+          <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div class="page-header__breadcrumb">
+            <a href="clients.html">クライアント</a>
+            <span class="page-header__breadcrumb-sep">/</span>
+            <span class="page-header__breadcrumb-current">ふららぼ</span>
+          </div>
+        </div>
+        <div class="page-header__right">
+          <button class="btn btn--secondary btn--sm">
+            <span class="btn__icon"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>
+            編集
+          </button>
+        </div>
+      </header>
+
+      <div class="page-content">
+
+        <!-- Detail Header -->
+        <div class="detail-header">
+          <div class="detail-header__top">
+            <h1 class="detail-header__name">
+              ふららぼ
+              <span class="badge badge--success"><span class="badge__dot"></span>契約中</span>
+            </h1>
+            <span class="next-date next-date--upcoming">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              NEXT: 3/1
+            </span>
+          </div>
+          <div class="detail-header__meta">
+            <span class="detail-header__meta-item">
+              <span class="badge badge--default badge--xs">SNS運用</span>
+            </span>
+            <span class="detail-header__meta-item">コンカフェ</span>
+            <span class="detail-header__meta-item">株式会社SRC</span>
+            <span class="detail-header__meta-item detail-header__meta-item--primary">¥300,000/月</span>
+          </div>
+        </div>
+
+        <!-- Contract Summary Cards -->
+        <div class="contract-summary">
+          <div class="contract-summary__item">
+            <div class="contract-summary__label">プラン</div>
+            <div class="contract-summary__value">レギュラー</div>
+          </div>
+          <div class="contract-summary__item">
+            <div class="contract-summary__label">月額</div>
+            <div class="contract-summary__value contract-summary__value--primary">¥300,000</div>
+          </div>
+          <div class="contract-summary__item">
+            <div class="contract-summary__label">契約期間</div>
+            <div class="contract-summary__value contract-summary__value--sm">2025/09 〜 継続中</div>
+          </div>
+        </div>
+
+        <!-- Detail Body -->
+        <div class="detail-body">
+          <div class="detail-body__main">
+
+            <!-- Tabs -->
+            <div class="tabs">
+              <div class="tab is-active" data-tab="contract">契約情報</div>
+              <div class="tab" data-tab="projects">案件・タスク</div>
+              <div class="tab" data-tab="activity">対応履歴</div>
+            </div>
+
+            <!-- Tab: 契約情報 -->
+            <div class="tab-content is-active" data-tab-content="contract">
+              <div class="info-section">
+                <div class="info-section__header">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                  基本情報
+                </div>
+                <div class="info-section__body">
+                  <div class="info-grid">
+                    <div class="info-grid__label">店舗名</div>
+                    <div class="info-grid__value">ふららぼ</div>
+                    <div class="info-grid__label">運営会社</div>
+                    <div class="info-grid__value">株式会社SRC</div>
+                    <div class="info-grid__label">業種</div>
+                    <div class="info-grid__value">コンセプトカフェ</div>
+                    <div class="info-grid__label">担当者</div>
+                    <div class="info-grid__value">SRC担当</div>
+                    <div class="info-grid__label">電話</div>
+                    <div class="info-grid__value"><a href="tel:03-0000-0000">03-0000-0000</a></div>
+                    <div class="info-grid__label">メール</div>
+                    <div class="info-grid__value"><a href="mailto:info@src.co.jp">info@src.co.jp</a></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="info-section">
+                <div class="info-section__header">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                  契約詳細
+                </div>
+                <div class="info-section__body">
+                  <div class="info-grid">
+                    <div class="info-grid__label">サービス</div>
+                    <div class="info-grid__value">SNS運用代行</div>
+                    <div class="info-grid__label">プラン</div>
+                    <div class="info-grid__value">レギュラープラン</div>
+                    <div class="info-grid__label">月額</div>
+                    <div class="info-grid__value info-grid__value--primary">¥300,000</div>
+                    <div class="info-grid__label">契約開始日</div>
+                    <div class="info-grid__value">2025/09/01</div>
+                    <div class="info-grid__label">契約終了日</div>
+                    <div class="info-grid__value">なし（自動更新）</div>
+                    <div class="info-grid__label">契約書</div>
+                    <div class="info-grid__value"><a href="#">Google Drive で開く</a></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="info-section">
+                <div class="info-section__header">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                  SNSアカウント
+                </div>
+                <div class="info-section__body">
+                  <div class="info-grid">
+                    <div class="info-grid__label">Instagram</div>
+                    <div class="info-grid__value"><a href="#">@furarabo</a></div>
+                    <div class="info-grid__label">TikTok</div>
+                    <div class="info-grid__value"><a href="#">@furarabo</a></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab: 案件・タスク -->
+            <div class="tab-content" data-tab-content="projects">
+              <div class="section__header section__header--spaced">
+                <h3 class="section__title">2026年2月 SNS運用</h3>
+                <button class="btn btn--secondary btn--sm">
+                  <span class="btn__icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+                  タスク追加
+                </button>
+              </div>
+              <div class="task-list">
+                <div class="task-item is-done">
+                  <div class="task-item__check is-done">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                  <div class="task-item__content">
+                    <div class="task-item__title">企画・台本作成（8本）</div>
+                    <div class="task-item__meta">
+                      <span>撮影</span>
+                      <span>完了: 2/10</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="task-item is-done">
+                  <div class="task-item__check is-done">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                  <div class="task-item__content">
+                    <div class="task-item__title">撮影（8本）</div>
+                    <div class="task-item__meta">
+                      <span>撮影</span>
+                      <span>完了: 2/15</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="task-item">
+                  <div class="task-item__check"></div>
+                  <div class="task-item__content">
+                    <div class="task-item__title">編集・投稿（8本）</div>
+                    <div class="task-item__meta">
+                      <span>編集</span>
+                      <span>期限: 2/28</span>
+                      <span>担当: 栗原</span>
+                    </div>
+                  </div>
+                  <span class="task-item__priority task-item__priority--medium">中</span>
+                </div>
+                <div class="task-item">
+                  <div class="task-item__check"></div>
+                  <div class="task-item__content">
+                    <div class="task-item__title">月次レポート作成・送付</div>
+                    <div class="task-item__meta">
+                      <span>レポート</span>
+                      <span>期限: 3/5</span>
+                      <span>担当: 上田</span>
+                    </div>
+                  </div>
+                  <span class="task-item__priority task-item__priority--high">高</span>
+                </div>
+                <div class="task-item">
+                  <div class="task-item__check"></div>
+                  <div class="task-item__content">
+                    <div class="task-item__title">月次MTG実施</div>
+                    <div class="task-item__meta">
+                      <span>MTG</span>
+                      <span>期限: 3/1</span>
+                      <span>担当: 上田</span>
+                    </div>
+                  </div>
+                  <span class="task-item__priority task-item__priority--high">高</span>
+                </div>
+                <div class="task-item">
+                  <div class="task-item__check"></div>
+                  <div class="task-item__content">
+                    <div class="task-item__title">コメント一次対応</div>
+                    <div class="task-item__meta">
+                      <span>運用</span>
+                      <span>毎日</span>
+                      <span>担当: 上田</span>
+                    </div>
+                  </div>
+                  <span class="task-item__priority task-item__priority--low">低</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab: 対応履歴 -->
+            <div class="tab-content" data-tab-content="activity">
+              <div class="section__header section__header--spaced">
+                <h3 class="section__title">対応履歴</h3>
+                <button class="btn btn--secondary btn--sm">
+                  <span class="btn__icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+                  記録を追加
+                </button>
+              </div>
+              <div class="timeline">
+                <div class="timeline-item">
+                  <div class="timeline-item__icon timeline-item__icon--meeting">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                  </div>
+                  <div class="timeline-item__content">
+                    <div class="timeline-item__header">
+                      <span class="timeline-item__type">MTG</span>
+                      <span class="timeline-item__date">2026/02/25 14:00</span>
+                    </div>
+                    <div class="timeline-item__summary">撮影日程の調整MTG。3/5に撮影確定。3月の企画案も共有済み。</div>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-item__icon timeline-item__icon--note">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  </div>
+                  <div class="timeline-item__content">
+                    <div class="timeline-item__header">
+                      <span class="timeline-item__type">メモ</span>
+                      <span class="timeline-item__date">2026/02/15</span>
+                    </div>
+                    <div class="timeline-item__summary">2月分の撮影完了（8本）。栗原さんに編集依頼済み。</div>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-item__icon timeline-item__icon--meeting">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                  </div>
+                  <div class="timeline-item__content">
+                    <div class="timeline-item__header">
+                      <span class="timeline-item__type">月次MTG</span>
+                      <span class="timeline-item__date">2026/02/03 15:00</span>
+                    </div>
+                    <div class="timeline-item__summary">1月分のレポート報告。TikTokフォロワー+320、エンゲージメント率4.2%。先方満足度高い。</div>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-item__icon timeline-item__icon--email">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  </div>
+                  <div class="timeline-item__content">
+                    <div class="timeline-item__header">
+                      <span class="timeline-item__type">メール</span>
+                      <span class="timeline-item__date">2026/01/28</span>
+                    </div>
+                    <div class="timeline-item__summary">月次レポート送付。1月の実績まとめと2月の企画案を添付。</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Quick Actions Sidebar -->
+          <div class="detail-body__sidebar">
+            <div class="quick-actions">
+              <div class="quick-actions__title">クイックアクション</div>
+              <div class="quick-actions__list">
+                <button class="quick-action-btn">
+                  <span class="quick-action-btn__icon">
+                    <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </span>
+                  対応記録を追加
+                </button>
+                <button class="quick-action-btn">
+                  <span class="quick-action-btn__icon">
+                    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                  </span>
+                  タスクを追加
+                </button>
+                <button class="quick-action-btn">
+                  <span class="quick-action-btn__icon">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  </span>
+                  NEXT日付を変更
+                </button>
+                <button class="quick-action-btn">
+                  <span class="quick-action-btn__icon">
+                    <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  </span>
+                  電話する
+                </button>
+                <button class="quick-action-btn">
+                  <span class="quick-action-btn__icon">
+                    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                  </span>
+                  契約書を確認
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/detail.js"></script>
+</body>
+</html>

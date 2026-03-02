@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <title>Lounge VELVET - リード詳細 - Opus CRM</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/detail.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <div class="app">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar__logo">
+        <div class="sidebar__logo-icon">O</div>
+        <div>
+          <div class="sidebar__logo-text">Opus CRM</div>
+          <span class="sidebar__logo-sub">営業管理</span>
+        </div>
+      </div>
+      <nav class="sidebar__nav">
+        <span class="sidebar__section-label">メニュー</span>
+        <a href="index.html" class="nav-item">
+          <span class="nav-item__icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
+          ダッシュボード
+        </a>
+        <a href="leads.html" class="nav-item is-active">
+          <span class="nav-item__icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+          リード管理
+          <span class="nav-item__badge">12</span>
+        </a>
+        <a href="clients.html" class="nav-item">
+          <span class="nav-item__icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+          クライアント
+        </a>
+        <a href="tasks.html" class="nav-item">
+          <span class="nav-item__icon"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+          タスク
+        </a>
+        <span class="sidebar__section-label">その他</span>
+        <a href="settings.html" class="nav-item">
+          <span class="nav-item__icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+          設定
+        </a>
+      </nav>
+      <div class="sidebar__footer">
+        <div class="sidebar__user">
+          <div class="sidebar__avatar">上</div>
+          <div>
+            <div class="sidebar__user-name">上田 琉</div>
+            <div class="sidebar__user-role">管理者</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main -->
+    <main class="main">
+      <header class="page-header">
+        <div class="page-header__left">
+          <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div class="page-header__breadcrumb">
+            <a href="leads.html">リード管理</a>
+            <span class="page-header__breadcrumb-sep">/</span>
+            <span class="page-header__breadcrumb-current">Lounge VELVET</span>
+          </div>
+        </div>
+        <div class="page-header__right">
+          <button class="btn btn--secondary btn--sm">
+            <span class="btn__icon"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>
+            編集
+          </button>
+          <button class="btn btn--ghost btn--sm btn--ghost-danger">削除</button>
+        </div>
+      </header>
+
+      <div class="page-content">
+
+        <!-- Detail Header Card -->
+        <div class="detail-header">
+          <div class="detail-header__top">
+            <h1 class="detail-header__name">
+              Lounge VELVET
+              <span class="badge badge--purple"><span class="badge__dot"></span>アポ確定</span>
+            </h1>
+            <span class="next-date next-date--today">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              NEXT: 2/25（今日）
+            </span>
+          </div>
+          <div class="detail-header__meta">
+            <span class="detail-header__meta-item">
+              <span class="detail-header__meta-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+              六本木
+            </span>
+            <span class="detail-header__meta-item">
+              <span class="detail-header__meta-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+              バー
+            </span>
+            <span class="detail-header__meta-item">
+              <span class="badge badge--default badge--xs">SNS運用</span>
+            </span>
+            <span class="detail-header__meta-item">
+              <span class="detail-header__meta-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+              見込み ¥30万/月
+            </span>
+            <span class="detail-header__meta-item">
+              <span class="detail-header__meta-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+              DM
+            </span>
+          </div>
+        </div>
+
+        <!-- Detail Body -->
+        <div class="detail-body">
+          <div class="detail-body__main">
+
+            <!-- Tabs -->
+            <div class="tabs">
+              <div class="tab is-active" data-tab="info">基本情報</div>
+              <div class="tab" data-tab="activity">対応履歴</div>
+              <div class="tab" data-tab="notes">メモ</div>
+            </div>
+
+            <!-- Tab: 基本情報 -->
+            <div class="tab-content is-active" data-tab-content="info">
+              <div class="info-section">
+                <div class="info-section__header">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                  店舗情報
+                </div>
+                <div class="info-section__body">
+                  <div class="info-grid">
+                    <div class="info-grid__label">店舗名</div>
+                    <div class="info-grid__value">Lounge VELVET</div>
+                    <div class="info-grid__label">企業名</div>
+                    <div class="info-grid__value">株式会社VELVET</div>
+                    <div class="info-grid__label">業種</div>
+                    <div class="info-grid__value">バー</div>
+                    <div class="info-grid__label">エリア</div>
+                    <div class="info-grid__value">東京都港区六本木4-12-8</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="info-section">
+                <div class="info-section__header">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                  連絡先
+                </div>
+                <div class="info-section__body">
+                  <div class="info-grid">
+                    <div class="info-grid__label">担当者</div>
+                    <div class="info-grid__value">山田 健太</div>
+                    <div class="info-grid__label">電話</div>
+                    <div class="info-grid__value"><a href="tel:03-1234-5678">03-1234-5678</a></div>
+                    <div class="info-grid__label">メール</div>
+                    <div class="info-grid__value"><a href="mailto:yamada@velvet-lounge.com">yamada@velvet-lounge.com</a></div>
+                    <div class="info-grid__label">LINE</div>
+                    <div class="info-grid__value">@velvet-lounge</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="info-section">
+                <div class="info-section__header">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                  SNSアカウント
+                </div>
+                <div class="info-section__body">
+                  <div class="info-grid">
+                    <div class="info-grid__label">Instagram</div>
+                    <div class="info-grid__value"><a href="#">@lounge_velvet</a>（フォロワー 1,240）</div>
+                    <div class="info-grid__label">TikTok</div>
+                    <div class="info-grid__value"><a href="#">@loungevlvet</a>（フォロワー 380）</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="info-section">
+                <div class="info-section__header">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  見込み情報
+                </div>
+                <div class="info-section__body">
+                  <div class="info-grid">
+                    <div class="info-grid__label">見込みプラン</div>
+                    <div class="info-grid__value">レギュラープラン</div>
+                    <div class="info-grid__label">見込み月額</div>
+                    <div class="info-grid__value info-grid__value--primary">¥300,000/月</div>
+                    <div class="info-grid__label">ソース</div>
+                    <div class="info-grid__value">Instagram DM</div>
+                    <div class="info-grid__label">リスト追加日</div>
+                    <div class="info-grid__value">2026/02/15</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab: 対応履歴 -->
+            <div class="tab-content" data-tab-content="activity">
+              <div class="section__header section__header--spaced">
+                <h3 class="section__title">対応履歴</h3>
+                <button class="btn btn--secondary btn--sm">
+                  <span class="btn__icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+                  記録を追加
+                </button>
+              </div>
+              <div class="timeline">
+                <div class="timeline-item">
+                  <div class="timeline-item__icon timeline-item__icon--meeting">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                  </div>
+                  <div class="timeline-item__content">
+                    <div class="timeline-item__header">
+                      <span class="timeline-item__type">アポ確定</span>
+                      <span class="timeline-item__date">2026/02/22 18:30</span>
+                    </div>
+                    <div class="timeline-item__summary">Instagram DMで商談日程を確定。2/25 15:00〜 六本木の店舗で初回商談。レギュラープランに興味あり。</div>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-item__icon timeline-item__icon--dm">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  </div>
+                  <div class="timeline-item__content">
+                    <div class="timeline-item__header">
+                      <span class="timeline-item__type">DM返信</span>
+                      <span class="timeline-item__date">2026/02/20 14:00</span>
+                    </div>
+                    <div class="timeline-item__summary">先方から返信あり。「TikTokの運用に興味がある。一度話を聞きたい」とのこと。</div>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-item__icon timeline-item__icon--dm">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  </div>
+                  <div class="timeline-item__content">
+                    <div class="timeline-item__header">
+                      <span class="timeline-item__type">初回DM送信</span>
+                      <span class="timeline-item__date">2026/02/18 10:00</span>
+                    </div>
+                    <div class="timeline-item__summary">Instagramから初回営業DM送信。アカウント分析に基づく具体的な改善提案を添付。</div>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-item__icon timeline-item__icon--note">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  </div>
+                  <div class="timeline-item__content">
+                    <div class="timeline-item__header">
+                      <span class="timeline-item__type">リスト追加</span>
+                      <span class="timeline-item__date">2026/02/15</span>
+                    </div>
+                    <div class="timeline-item__summary">TikTokで発見。六本木エリアのラウンジバー。Instagram投稿は不定期、TikTokはアカウントあるが未運用。ポテンシャルあり。</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab: メモ -->
+            <div class="tab-content" data-tab-content="notes">
+              <div class="info-section">
+                <div class="info-section__body">
+                  <p class="detail-notes">
+                    六本木エリアのラウンジバー。内装がおしゃれでTikTok映えする空間。<br>
+                    Instagram投稿は月2-3回程度で不定期。TikTokアカウントは作成済みだが投稿なし。<br>
+                    ターゲット客層は20代後半〜30代の女性グループ。<br><br>
+                    山田さん（オーナー兼店長）は30代前半。SNSの重要性は理解しているが、運用リソースがないとのこと。<br>
+                    レギュラープラン（30万/月）に興味を示している。
+                  </p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Quick Actions Sidebar -->
+          <div class="detail-body__sidebar">
+            <div class="quick-actions">
+              <div class="quick-actions__title">クイックアクション</div>
+              <div class="quick-actions__list">
+                <button class="quick-action-btn">
+                  <span class="quick-action-btn__icon">
+                    <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </span>
+                  対応記録を追加
+                </button>
+                <button class="quick-action-btn">
+                  <span class="quick-action-btn__icon">
+                    <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                  </span>
+                  ステージを変更
+                </button>
+                <button class="quick-action-btn">
+                  <span class="quick-action-btn__icon">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  </span>
+                  NEXT日付を変更
+                </button>
+                <button class="quick-action-btn">
+                  <span class="quick-action-btn__icon">
+                    <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  </span>
+                  電話する
+                </button>
+                <button class="quick-action-btn quick-action-btn--primary quick-action-btn--spaced">
+                  <span class="quick-action-btn__icon">
+                    <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                  </span>
+                  成約 → クライアント登録
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/detail.js"></script>
+</body>
+</html>

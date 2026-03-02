@@ -1,0 +1,147 @@
+/* ========================================
+   Opus CRM — Responsive (< 900px)
+   ======================================== */
+
+@media (max-width: 900px) {
+  /* Sidebar → hidden (hamburger toggle) */
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform var(--transition-slow);
+  }
+
+  .sidebar.is-open {
+    transform: translateX(0);
+  }
+
+  .main {
+    margin-left: 0;
+  }
+
+  .page-header {
+    padding: 0 var(--space-4);
+  }
+
+  .page-content {
+    padding: var(--space-4);
+  }
+
+  /* Mobile menu button */
+  .mobile-menu-btn {
+    display: flex;
+  }
+
+  /* Metrics */
+  .metric-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+  }
+
+  /* Dashboard layout */
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Detail layout */
+  .detail-body {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-actions {
+    position: static;
+  }
+
+  /* Pipeline scroll */
+  .pipeline {
+    padding-bottom: var(--space-6);
+  }
+
+  .pipeline__column {
+    min-width: 200px;
+    width: 200px;
+  }
+
+  /* Tables → horizontal scroll */
+  .table-wrapper {
+    overflow-x: auto;
+  }
+
+  /* Contract summary */
+  .contract-summary {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+
+  /* Info grid */
+  .info-grid {
+    grid-template-columns: 100px 1fr;
+  }
+
+  /* Filters */
+  .filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-search {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .filters__spacer {
+    display: none;
+  }
+
+  /* Modal */
+  .modal {
+    max-width: none;
+    margin: var(--space-4);
+    max-height: calc(100vh - 2rem);
+  }
+}
+
+/* Hide mobile menu btn on desktop */
+.mobile-menu-btn {
+  display: none;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  border: none;
+  background: none;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.mobile-menu-btn:hover {
+  background: var(--color-surface-hover);
+}
+
+.mobile-menu-btn svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Sidebar overlay on mobile */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: calc(var(--z-sidebar) - 1);
+  /* Hidden by default, fade-in on open */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-slow);
+}
+
+@media (max-width: 900px) {
+  .sidebar.is-open ~ .sidebar-overlay {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}

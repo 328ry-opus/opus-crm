@@ -1,0 +1,113 @@
+/* ========================================
+   Opus CRM — Dashboard
+   ======================================== */
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: var(--space-6);
+}
+
+.dashboard-grid__main {
+  min-width: 0;
+}
+
+.dashboard-grid__side {
+  min-width: 0;
+}
+
+/* --- Action Table Name Cell --- */
+.action-name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.action-name__type {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.action-name__type--lead {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.action-name__type--client {
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.action-name__type--task {
+  background: var(--color-warning-light);
+  color: var(--color-warning-text);
+}
+
+.action-name__text {
+  font-weight: var(--font-medium);
+}
+
+.action-name__sub {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+}
+
+/* --- Recent Activity Feed --- */
+.activity-feed {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4);
+}
+
+.activity-feed__item {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.activity-feed__item:last-child {
+  border-bottom: none;
+}
+
+.activity-feed__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-border);
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.activity-feed__dot--dm { background: var(--color-info); }
+.activity-feed__dot--call { background: var(--color-success); }
+.activity-feed__dot--meeting { background: var(--color-purple); }
+.activity-feed__dot--note { background: var(--color-text-tertiary); }
+
+.activity-feed__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-feed__text {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-normal);
+}
+
+.activity-feed__text strong {
+  color: var(--color-text);
+  font-weight: var(--font-medium);
+}
+
+.activity-feed__time {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  margin-top: 2px;
+}

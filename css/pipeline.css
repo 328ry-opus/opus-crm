@@ -1,0 +1,315 @@
+/* ========================================
+   Opus CRM — Kanban Pipeline
+   ======================================== */
+
+.pipeline {
+  display: flex;
+  gap: var(--space-3);
+  overflow-x: auto;
+  padding-bottom: var(--space-4);
+  min-height: 400px;
+}
+
+.pipeline__column {
+  min-width: 220px;
+  width: 220px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.pipeline__column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.pipeline__column-name {
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.pipeline__column-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+}
+
+.pipeline__column--list .pipeline__column-dot { background: var(--stage-list); }
+.pipeline__column--dm .pipeline__column-dot { background: var(--stage-dm); }
+.pipeline__column--replied .pipeline__column-dot { background: var(--stage-replied); }
+.pipeline__column--appointment .pipeline__column-dot { background: var(--stage-appointment); }
+.pipeline__column--meeting .pipeline__column-dot { background: var(--stage-meeting); }
+.pipeline__column--proposal .pipeline__column-dot { background: var(--stage-proposal); }
+.pipeline__column--won .pipeline__column-dot { background: var(--stage-won); }
+.pipeline__column--lost .pipeline__column-dot { background: var(--stage-lost); }
+
+.pipeline__column-count {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  background: var(--color-surface-hover);
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pipeline__cards {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-1);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg);
+  min-height: 100px;
+}
+
+/* --- Pipeline Card --- */
+.pipeline-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.pipeline-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary-border);
+  transform: translateY(-1px);
+}
+
+/* Keyboard focus indicator */
+.pipeline-card:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.pipeline-card.is-overdue {
+  border-left: 3px solid var(--color-danger);
+}
+
+.pipeline-card__name {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+}
+
+.pipeline-card__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.pipeline-card__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.pipeline-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.pipeline-card__date {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+}
+
+.pipeline-card__date.is-overdue {
+  color: var(--color-danger);
+  font-weight: var(--font-semibold);
+}
+
+.pipeline-card__value {
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--color-primary);
+}
+
+/* --- Pipeline Add Button --- */
+.pipeline__add {
+  width: 100%;
+  padding: var(--space-2);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--color-text-tertiary);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  margin-top: var(--space-2);
+}
+
+.pipeline__add:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+/* --- Drag & Drop States --- */
+.pipeline-card.is-dragging,
+.task-kanban-card.is-dragging {
+  opacity: 0.4;
+  transform: rotate(2deg);
+  box-shadow: var(--shadow-lg);
+}
+
+.pipeline__cards.is-drag-over {
+  background: var(--color-primary-light);
+  outline: 2px dashed var(--color-primary-border);
+  outline-offset: -2px;
+}
+
+/* --- Task Pipeline Modifier --- */
+.pipeline--tasks {
+  min-height: 500px;
+}
+
+.pipeline--tasks .pipeline__column {
+  min-width: 300px;
+  width: 300px;
+}
+
+/* --- Task Column Dot Colors --- */
+.pipeline__column--todo .pipeline__column-dot { background: var(--color-text-tertiary); }
+.pipeline__column--progress .pipeline__column-dot { background: var(--color-primary); }
+.pipeline__column--done .pipeline__column-dot { background: var(--color-success); }
+
+/* --- Task Kanban Card --- */
+.task-kanban-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.task-kanban-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary-border);
+  transform: translateY(-1px);
+}
+
+.task-kanban-card.is-overdue {
+  border-left: 3px solid var(--color-danger);
+}
+
+.task-kanban-card.is-done {
+  opacity: 0.6;
+}
+
+.task-kanban-card.is-done .task-kanban-card__title {
+  text-decoration: line-through;
+}
+
+.task-kanban-card__title {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+}
+
+.task-kanban-card__client {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-bottom: var(--space-2);
+}
+
+.task-kanban-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.task-kanban-card__date {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+}
+
+.task-kanban-card__date.is-overdue {
+  color: var(--color-danger);
+  font-weight: var(--font-semibold);
+}
+
+.task-kanban-card__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.task-kanban-card__priority {
+  font-size: 10px;
+  font-weight: var(--font-semibold);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.task-kanban-card__priority--high {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+.task-kanban-card__priority--medium {
+  background: var(--color-warning-light);
+  color: var(--color-warning-text);
+}
+
+.task-kanban-card__priority--low {
+  background: var(--color-surface-hover);
+  color: var(--color-text-tertiary);
+}
+
+.task-kanban-card__assignee {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: var(--font-semibold);
+}
+
+.task-kanban-card__assignee--alt {
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
+/* --- Pipeline Empty State --- */
+.pipeline__empty {
+  padding: var(--space-6) var(--space-3);
+}
+
+.pipeline__empty-text {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+}
