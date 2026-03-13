@@ -78,7 +78,14 @@ function renderClients() {
     </tr>`;
   });
 
-  tbody.innerHTML = rows.join('');
+  if (rows.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:var(--space-8) var(--space-4); color:var(--color-text-tertiary);">
+      <div style="font-size:var(--text-lg); margin-bottom:var(--space-2);">まだクライアントがいません</div>
+      <div style="font-size:var(--text-sm);">リードが成約するとクライアントとして登録されます</div>
+    </td></tr>`;
+  } else {
+    tbody.innerHTML = rows.join('');
+  }
 
   // Update footer stats
   const footerCount = document.getElementById('footerCount');

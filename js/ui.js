@@ -14,6 +14,54 @@ function initSidebar() {
   if (overlay) {
     overlay.addEventListener('click', () => sidebar.classList.remove('is-open'));
   }
+
+  // Dynamic badge counts
+  updateSidebarBadges();
+}
+
+// --- Update sidebar nav badges from Store data ---
+function updateSidebarBadges() {
+  if (typeof Store === 'undefined') return;
+
+  // Active leads (exclude won/lost)
+  const leads = Store.getLeads();
+  const activeLeads = leads.filter(l => l.stage !== 'won' && l.stage !== 'lost').length;
+
+  // Pending tasks (todo + in-progress)
+  const tasks = Store.getTasks();
+  const pendingTasks = tasks.filter(t => t.status !== 'done').length;
+
+  // Update lead badge
+  const leadLink = document.querySelector('a[href="leads.html"]');
+  if (leadLink) {
+    let badge = leadLink.querySelector('.nav-item__badge');
+    if (activeLeads > 0) {
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'nav-item__badge';
+        leadLink.appendChild(badge);
+      }
+      badge.textContent = activeLeads;
+    } else if (badge) {
+      badge.remove();
+    }
+  }
+
+  // Update task badge
+  const taskLink = document.querySelector('a[href="tasks.html"]');
+  if (taskLink) {
+    let badge = taskLink.querySelector('.nav-item__badge');
+    if (pendingTasks > 0) {
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'nav-item__badge';
+        taskLink.appendChild(badge);
+      }
+      badge.textContent = pendingTasks;
+    } else if (badge) {
+      badge.remove();
+    }
+  }
 }
 
 // --- Tabs ---

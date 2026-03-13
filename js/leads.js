@@ -450,7 +450,7 @@ function showTableView() {
         </tr>
       </thead>
       <tbody>
-        ${leads.map(lead => buildTableRow(lead)).join('')}
+        ${leads.length > 0 ? leads.map(lead => buildTableRow(lead)).join('') : `<tr><td colspan="9" style="text-align:center; padding:var(--space-8) var(--space-4); color:var(--color-text-tertiary);"><div style="font-size:var(--text-lg); margin-bottom:var(--space-2);">まだリードがありません</div><div style="font-size:var(--text-sm);">Nキーまたは「新規リード」ボタンで追加しましょう</div></td></tr>`}
       </tbody>
     </table>
   `;
@@ -647,16 +647,6 @@ function handleBulkDelete() {
 // ============================================
 // Sidebar Badges
 // ============================================
-function updateSidebarBadges() {
-  const allLeads = Store.getLeads();
-  const activeLeads = allLeads.filter(l => l.stage !== 'won' && l.stage !== 'lost');
-
-  // Update lead badge in sidebar
-  const leadNavItem = document.querySelector('a[href="leads.html"] .nav-item__badge');
-  if (leadNavItem) {
-    leadNavItem.textContent = activeLeads.length;
-  }
-}
 
 // ============================================
 // Utility

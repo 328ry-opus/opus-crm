@@ -55,8 +55,22 @@ function renderTasks() {
       cardsContainer.appendChild(card);
     });
 
+    // Empty state for non-todo columns
+    if (tasks.length === 0 && status !== 'todo') {
+      const empty = document.createElement('div');
+      empty.className = 'empty-state empty-state--compact';
+      empty.innerHTML = `<div class="empty-state__text" style="font-size:var(--text-xs); color:var(--color-text-tertiary); padding:var(--space-4) 0;">タスクなし</div>`;
+      cardsContainer.appendChild(empty);
+    }
+
     // Add "+" button only in todo column
     if (status === 'todo') {
+      if (tasks.length === 0) {
+        const hint = document.createElement('div');
+        hint.style.cssText = 'text-align:center; padding:var(--space-4) 0; color:var(--color-text-tertiary); font-size:var(--text-xs);';
+        hint.textContent = 'Nキーまたは下のボタンで追加';
+        cardsContainer.appendChild(hint);
+      }
       const addBtn = document.createElement('button');
       addBtn.className = 'pipeline__add';
       addBtn.textContent = '+ タスクを追加';
@@ -70,7 +84,7 @@ function renderTasks() {
   }
 
   // Update nav badge (todo count, unfiltered)
-  updateNavBadge();
+  updateSidebarBadges();
 
   // Re-init drag & drop on freshly rendered cards
   initDragAndDrop();
@@ -212,12 +226,7 @@ function getEntityName(task) {
 // ============================================
 // Nav badge update (unfiltered todo count)
 // ============================================
-function updateNavBadge() {
-  const allTasks = Store.getTasksByStatus();
-  const todoCount = (allTasks['todo'] || []).length;
-  const badge = document.querySelector('.nav-item.is-active .nav-item__badge');
-  if (badge) badge.textContent = todoCount;
-}
+// Badge update is handled by updateSidebarBadges() in ui.js
 
 // ============================================
 // Drag & Drop

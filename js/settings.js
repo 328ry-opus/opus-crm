@@ -12,10 +12,17 @@ document.addEventListener('DOMContentLoaded', () => {
   renderPlans();
   renderStoreTypes();
   renderSourceTypes();
+  renderTeamMembers();
   initSettingsActions();
   initCsvImport();
   initJsonImport();
 });
+
+// --- Helper: get custom items from settings ---
+function getCustomItems(key) {
+  const settings = Store.getSettings();
+  return settings[key] || [];
+}
 
 // --- Settings Navigation ---
 function initSettingsNav() {
@@ -83,40 +90,122 @@ function renderTaskStatuses() {
   `).join('');
 }
 
-// --- Render Plans ---
+// --- Render Plans (built-in + custom) ---
 function renderPlans() {
   const tbody = document.getElementById('planTableBody');
   if (!tbody) return;
 
-  tbody.innerHTML = CRM.PLANS.map(plan => `
+  const allPlans = [...CRM.PLANS, ...getCustomItems('custom_plans')];
+  tbody.innerHTML = allPlans.map((plan, i) => {
+    const isCustom = i >= CRM.PLANS.length;
+    return `
     <tr>
       <td style="font-weight:var(--font-medium)">${plan.label}</td>
       <td class="plan-table__fee">${plan.fee ? formatCurrency(plan.fee) + '/月' : '従量制'}</td>
       <td style="text-align:right">
-        <button class="btn btn--ghost btn--sm">編集</button>
+        ${isCustom ? `<button class="btn btn--ghost btn--sm" data-remove-custom="custom_plans" data-remove-index="${i - CRM.PLANS.length}">削除</button>` : ''}
       </td>
     </tr>
-  `).join('');
+  `}).join('');
+
+  // Bind remove buttons
+  tbody.querySelectorAll('[data-remove-custom]').forEach(btn => {
+    btn.addEventListener('click', () => removeCustomItem(btn.dataset.removeCustom, parseInt(btn.dataset.removeIndex)));
+  });
 }
 
-// --- Render Store Types ---
+// --- Render Store Types (built-in + custom) ---
 function renderStoreTypes() {
   const container = document.getElementById('storeTypes');
   if (!container) return;
 
-  container.innerHTML = CRM.STORE_TYPES.map(t => `
-    <div class="tag-item">${t.label}</div>
-  `).join('');
+  const allTypes = [...CRM.STORE_TYPES, ...getCustomItems('custom_store_types')];
+  container.innerHTML = allTypes.map((t, i) => {
+    const isCustom = i >= CRM.STORE_TYPES.length;
+    return `<div class="tag-item">${t.label}${isCustom ? `<button class="tag-item__remove" data-remove-custom="custom_store_types" data-remove-index="${i - CRM.STORE_TYPES.length}">&times;</button>` : ''}</div>`;
+  }).join('');
+
+  container.querySelectorAll('[data-remove-custom]').forEach(btn => {
+    btn.addEventListener('click', () => removeCustomItem(btn.dataset.removeCustom, parseInt(btn.dataset.removeIndex)));
+  });
 }
 
-// --- Render Source Types ---
+// --- Render Source Types (built-in + custom) ---
 function renderSourceTypes() {
   const container = document.getElementById('sourceTypes');
   if (!container) return;
 
-  container.innerHTML = CRM.SOURCES.map(s => `
-    <div class="tag-item">${s.label}</div>
-  `).join('');
+  const allSources = [...CRM.SOURCES, ...getCustomItems('custom_sources')];
+  container.innerHTML = allSources.map((s, i) => {
+    const isCustom = i >= CRM.SOURCES.length;
+    return `<div class="tag-item">${s.label}${isCustom ? `<button class="tag-item__remove" data-remove-custom="custom_sources" data-remove-index="${i - CRM.SOURCES.length}">&times;</button>` : ''}</div>`;
+  }).join('');
+
+  container.querySelectorAll('[data-remove-custom]').forEach(btn => {
+    btn.addEventListener('click', () => removeCustomItem(btn.dataset.removeCustom, parseInt(btn.dataset.removeIndex)));
+  });
+}
+
+// --- Remove custom item ---
+function removeCustomItem(key, index) {
+  const settings = Store.getSettings();
+  if (!settings[key]) return;
+  const removed = settings[key].splice(index, 1);
+  Store.saveSettings(settings);
+
+  // Re-render the affected section
+  if (key === 'custom_store_types') renderStoreTypes();
+  else if (key === 'custom_sources') renderSourceTypes();
+  else if (key === 'custom_plans') renderPlans();
+
+  showToast(`${removed[0]?.label || '項目'}を削除しました`);
+}
+
+// --- Render Team Members (built-in + custom, persisted) ---
+function renderTeamMembers() {
+  const list = document.querySelector('.member-list');
+  if (!list) return;
+
+  const builtIn = [
+    { name: '上田 琉', role: 'admin', area: '営業・ディレクション', isOwner: true, color: 'primary' },
+    { name: '栗原', role: 'member', area: '撮影・編集', isOwner: false, color: 'purple' },
+  ];
+  const custom = getCustomItems('custom_members');
+
+  const allMembers = [...builtIn, ...custom.map(m => ({ ...m, isOwner: false, color: 'purple' }))];
+
+  list.innerHTML = allMembers.map((m, i) => {
+    const initial = m.name.charAt(0);
+    const roleLabel = m.role === 'admin' ? '管理者' : 'メンバー';
+    const area = m.area ? ' ・ ' + m.area : '';
+    const isCustom = i >= builtIn.length;
+
+    return `
+      <div class="member-item">
+        <div class="member-avatar member-avatar--${m.color}">${initial}</div>
+        <div class="member-info">
+          <div class="member-name">${m.name}</div>
+          <div class="member-role">${roleLabel}${area}</div>
+        </div>
+        <div class="member-actions">
+          ${m.isOwner ? '<span class="badge badge--primary">自分</span>' : isCustom ? `<button class="btn btn--ghost btn--sm" data-remove-member="${i - builtIn.length}">削除</button>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Bind remove buttons
+  list.querySelectorAll('[data-remove-member]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.dataset.removeMember);
+      const settings = Store.getSettings();
+      if (!settings.custom_members) return;
+      const removed = settings.custom_members.splice(idx, 1);
+      Store.saveSettings(settings);
+      renderTeamMembers();
+      showToast(`${removed[0]?.name || 'メンバー'}を削除しました`);
+    });
+  });
 }
 
 // --- Actions ---
@@ -124,7 +213,7 @@ function initSettingsActions() {
   // Save profile
   document.querySelector('[data-action="save-profile"]')?.addEventListener('click', saveProfile);
 
-  // Add member
+  // Add member (persisted to settings)
   document.querySelector('[data-action="add-member"]')?.addEventListener('click', () => {
     openModal({
       title: 'メンバーを追加',
@@ -143,9 +232,79 @@ function initSettingsActions() {
           showToast('名前を入力してください', 'error');
           return;
         }
-        addMemberItem(data);
+        const settings = Store.getSettings();
+        if (!settings.custom_members) settings.custom_members = [];
+        settings.custom_members.push(data);
+        Store.saveSettings(settings);
+        renderTeamMembers();
         closeModal();
         showToast(`${data.name} を追加しました`);
+      }
+    });
+  });
+
+  // Add store type
+  document.querySelector('[data-action="add-store-type"]')?.addEventListener('click', () => {
+    openModal({
+      title: '業種を追加',
+      body: formGroup('業種名 *', formInput('label', '例: エステサロン')),
+      submitLabel: '追加',
+      onSubmit: (form) => {
+        const data = getFormData(form);
+        if (!data.label) { showToast('業種名を入力してください', 'error'); return; }
+        const settings = Store.getSettings();
+        if (!settings.custom_store_types) settings.custom_store_types = [];
+        const value = data.label.toLowerCase().replace(/\s+/g, '-');
+        settings.custom_store_types.push({ value, label: data.label });
+        Store.saveSettings(settings);
+        renderStoreTypes();
+        closeModal();
+        showToast(`${data.label} を追加しました`);
+      }
+    });
+  });
+
+  // Add source
+  document.querySelector('[data-action="add-source"]')?.addEventListener('click', () => {
+    openModal({
+      title: 'ソースを追加',
+      body: formGroup('ソース名 *', formInput('label', '例: セミナー')),
+      submitLabel: '追加',
+      onSubmit: (form) => {
+        const data = getFormData(form);
+        if (!data.label) { showToast('ソース名を入力してください', 'error'); return; }
+        const settings = Store.getSettings();
+        if (!settings.custom_sources) settings.custom_sources = [];
+        const value = data.label.toLowerCase().replace(/\s+/g, '-');
+        settings.custom_sources.push({ value, label: data.label });
+        Store.saveSettings(settings);
+        renderSourceTypes();
+        closeModal();
+        showToast(`${data.label} を追加しました`);
+      }
+    });
+  });
+
+  // Add plan
+  document.querySelector('[data-action="add-plan"]')?.addEventListener('click', () => {
+    openModal({
+      title: 'プランを追加',
+      body: `
+        ${formGroup('プラン名 *', formInput('label', '例: プレミアムプラン'))}
+        ${formGroup('月額（円）', formInput('fee', '例: 100000（空欄で従量制）', 'number'))}
+      `,
+      submitLabel: '追加',
+      onSubmit: (form) => {
+        const data = getFormData(form);
+        if (!data.label) { showToast('プラン名を入力してください', 'error'); return; }
+        const settings = Store.getSettings();
+        if (!settings.custom_plans) settings.custom_plans = [];
+        const value = data.label.toLowerCase().replace(/\s+/g, '-');
+        settings.custom_plans.push({ value, label: data.label, fee: data.fee ? parseInt(data.fee) : null });
+        Store.saveSettings(settings);
+        renderPlans();
+        closeModal();
+        showToast(`${data.label} を追加しました`);
       }
     });
   });
@@ -436,30 +595,6 @@ function executeCsvImport() {
   let msg = `${successCount}件の${typeLabel}をインポートしました`;
   if (skipCount > 0) msg += `（${skipCount}件スキップ）`;
   showToast(msg);
-}
-
-// --- Add Member to List ---
-function addMemberItem(data) {
-  const list = document.querySelector('.member-list');
-  if (!list) return;
-
-  const initial = data.name.charAt(0);
-  const roleLabel = data.role === 'admin' ? '管理者' : 'メンバー';
-  const area = data.area ? ' ・ ' + data.area : '';
-
-  const item = document.createElement('div');
-  item.className = 'member-item';
-  item.innerHTML = `
-    <div class="member-avatar member-avatar--purple">${initial}</div>
-    <div class="member-info">
-      <div class="member-name">${data.name}</div>
-      <div class="member-role">${roleLabel}${area}</div>
-    </div>
-    <div class="member-actions">
-      <button class="btn btn--ghost btn--sm">編集</button>
-    </div>
-  `;
-  list.appendChild(item);
 }
 
 // --- JSON Import (Restore from backup) ---
