@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderMetrics();
   renderTodayActions();
   renderActivityFeed();
+  renderAnalytics();
   initDashboardActions();
 });
 
@@ -202,12 +203,76 @@ function formatActivityTime(isoStr) {
 
 // --- Dashboard button actions ---
 function initDashboardActions() {
-  // "新規リード" button
+  // "新規リード" button — open modal directly
   document.querySelectorAll('.btn--primary').forEach(btn => {
     if (btn.textContent.includes('新規リード')) {
-      btn.addEventListener('click', () => {
-        window.location.href = 'leads.html';
-      });
+      btn.addEventListener('click', () => openNewLeadFromDashboard());
+    }
+  });
+}
+
+// --- New Lead Modal (dashboard version) ---
+function openNewLeadFromDashboard() {
+  const stageOptions = CRM.LEAD_STAGES.map(s => ({ value: s.value, label: s.label }));
+
+  const body = `
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
+      ${formGroup('店舗名 *', formInput('store_name', '例: Bar Nocturne'))}
+      ${formGroup('企業名', formInput('company_name', '例: 株式会社ABC'))}
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
+      ${formGroup('事業種別', formSelect('business_type', CRM.BUSINESS_TYPES))}
+      ${formGroup('業種', formSelect('store_type', [{ value: '', label: '選択してください' }, ...CRM.STORE_TYPES]))}
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
+      ${formGroup('担当者名', formInput('contact_name', '例: 山田太郎'))}
+      ${formGroup('電話番号', formInput('contact_phone', '例: 03-1234-5678', 'tel'))}
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
+      ${formGroup('メール', formInput('contact_email', '例: info@example.com', 'email'))}
+      ${formGroup('LINE', formInput('contact_line', '例: @bar-nocturne'))}
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
+      ${formGroup('Instagram', formInput('sns_instagram', '例: @bar_nocturne'))}
+      ${formGroup('TikTok', formInput('sns_tiktok', '例: @bar.nocturne'))}
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
+      ${formGroup('ソース', formSelect('source', CRM.SOURCES))}
+      ${formGroup('見込みプラン', formSelect('estimated_plan', [{ value: '', label: '未定' }, ...CRM.PLANS.map(p => ({ value: p.value, label: p.label + (p.fee ? ' (' + formatCurrency(p.fee) + ')' : '') }))]))}
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
+      ${formGroup('エリア', formInput('area', '例: 渋谷、六本木'))}
+      ${formGroup('ステージ', formSelect('stage', stageOptions, 'list-added'))}
+    </div>
+    ${formGroup('メモ', formTextarea('notes', 'リードに関するメモを入力...'))}
+  `;
+
+  openModal({
+    title: '新規リード追加',
+    body,
+    submitLabel: '追加',
+    size: 'lg',
+    onSubmit: (form) => {
+      const data = getFormData(form);
+      if (!data.store_name) {
+        showToast('店舗名を入力してください', 'error');
+        return;
+      }
+
+      // Resolve estimated_fee from the selected plan
+      if (data.estimated_plan) {
+        const plan = CRM.PLANS.find(p => p.value === data.estimated_plan);
+        if (plan && plan.fee) data.estimated_fee = plan.fee;
+      }
+
+      Store.addLead(data);
+      closeModal();
+      showToast(`${data.store_name} をリストに追加しました`);
+
+      // Refresh dashboard data
+      renderMetrics();
+      renderTodayActions();
+      renderActivityFeed();
     }
   });
 }
@@ -218,4 +283,193 @@ function esc(str) {
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
+}
+
+
+// ============================================
+// Analytics Charts
+// ============================================
+function renderAnalytics() {
+  // Wait for Chart.js to load
+  if (typeof Chart === 'undefined') return;
+
+  renderPipelineChart();
+  renderRevenueChart();
+  renderKpiTable();
+}
+
+// --- Pipeline Funnel (horizontal bar chart) ---
+function renderPipelineChart() {
+  const canvas = document.getElementById('chartPipeline');
+  if (!canvas) return;
+
+  const leads = Store.getLeads();
+  const stages = CRM.LEAD_STAGES;
+
+  // Count leads per stage
+  const counts = stages.map(s => leads.filter(l => l.stage === s.value).length);
+  const colors = stages.map(s => s.color);
+
+  new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: stages.map(s => s.label),
+      datasets: [{
+        data: counts,
+        backgroundColor: colors,
+        borderRadius: 4,
+        barThickness: 22,
+      }],
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => `${ctx.raw}件`,
+          },
+        },
+      },
+      scales: {
+        x: {
+          beginAtZero: true,
+          ticks: { stepSize: 1, font: { size: 11 } },
+          grid: { color: 'rgba(0,0,0,0.05)' },
+        },
+        y: {
+          ticks: { font: { size: 11 } },
+          grid: { display: false },
+        },
+      },
+    },
+  });
+}
+
+// --- Revenue Donut (plan breakdown) ---
+function renderRevenueChart() {
+  const canvas = document.getElementById('chartRevenue');
+  if (!canvas) return;
+
+  const clients = Store.getClients().filter(c => c.status === 'active');
+
+  // Group by plan
+  const planMap = {};
+  clients.forEach(c => {
+    const plan = CRM.PLANS.find(p => p.value === c.plan);
+    const label = plan ? plan.label : 'その他';
+    planMap[label] = (planMap[label] || 0) + (c.monthly_fee || 0);
+  });
+
+  const labels = Object.keys(planMap);
+  const values = Object.values(planMap);
+
+  if (labels.length === 0) {
+    canvas.parentElement.innerHTML = '<div style="display:flex; align-items:center; justify-content:center; height:100%; color:var(--color-text-tertiary); font-size:var(--text-sm);">契約中クライアントがありません</div>';
+    return;
+  }
+
+  const palette = ['#6366f1', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#06b6d4'];
+
+  new Chart(canvas, {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: palette.slice(0, labels.length),
+        borderWidth: 0,
+        hoverOffset: 6,
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '60%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { font: { size: 11 }, padding: 12, usePointStyle: true, pointStyleWidth: 8 },
+        },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+              const pct = total > 0 ? Math.round((ctx.raw / total) * 100) : 0;
+              return `${ctx.label}: ${formatCurrency(ctx.raw)}/月 (${pct}%)`;
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
+// --- KPI Table (per assignee) ---
+function renderKpiTable() {
+  const container = document.getElementById('kpiTable');
+  if (!container) return;
+
+  const leads = Store.getLeads();
+  const clients = Store.getClients();
+  const allAssignees = CRM.ASSIGNEES;
+
+  const kpiRows = allAssignees.map(a => {
+    const myLeads = leads.filter(l => l.assigned_to === a.value);
+    const activeLeads = myLeads.filter(l => !['won', 'lost'].includes(l.stage));
+    const wonLeads = myLeads.filter(l => l.stage === 'won');
+    const myClients = clients.filter(c => c.assigned_to === a.value && c.status === 'active');
+    const monthlyTotal = myClients.reduce((sum, c) => sum + (c.monthly_fee || 0), 0);
+    const leadPipeline = activeLeads.reduce((sum, l) => sum + (l.estimated_fee || 0), 0);
+
+    return {
+      name: a.label,
+      activeLeads: activeLeads.length,
+      wonLeads: wonLeads.length,
+      clients: myClients.length,
+      monthly: monthlyTotal,
+      pipeline: leadPipeline,
+    };
+  });
+
+  // Totals row
+  const totals = {
+    name: '合計',
+    activeLeads: kpiRows.reduce((s, r) => s + r.activeLeads, 0),
+    wonLeads: kpiRows.reduce((s, r) => s + r.wonLeads, 0),
+    clients: kpiRows.reduce((s, r) => s + r.clients, 0),
+    monthly: kpiRows.reduce((s, r) => s + r.monthly, 0),
+    pipeline: kpiRows.reduce((s, r) => s + r.pipeline, 0),
+  };
+
+  const rows = [...kpiRows, totals];
+
+  container.innerHTML = `
+    <table class="kpi-table">
+      <thead>
+        <tr>
+          <th>担当者</th>
+          <th>商談中リード</th>
+          <th>成約</th>
+          <th>契約中</th>
+          <th>月額合計</th>
+          <th>見込み月額</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(r => `
+          <tr>
+            <td>${esc(r.name)}</td>
+            <td>${r.activeLeads}件</td>
+            <td>${r.wonLeads}件</td>
+            <td>${r.clients}件</td>
+            <td class="kpi-value">${r.monthly ? formatCurrency(r.monthly) : '—'}</td>
+            <td>${r.pipeline ? formatCurrency(r.pipeline) : '—'}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
 }

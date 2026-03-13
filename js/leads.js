@@ -397,6 +397,11 @@ function openNewLeadModal(defaultStage) {
 }
 
 // ============================================
+// Bulk Selection State
+// ============================================
+const selectedLeadIds = new Set();
+
+// ============================================
 // View Switch (Kanban / Table)
 // ============================================
 function handleViewSwitch(viewName) {
@@ -409,6 +414,7 @@ function handleViewSwitch(viewName) {
   } else {
     pipeline.style.display = '';
     hideTableView();
+    hideBulkBar();
   }
 }
 
@@ -416,6 +422,8 @@ function showTableView() {
   // Remove existing table if any
   const existing = document.getElementById('leadsTableView');
   if (existing) existing.remove();
+
+  selectedLeadIds.clear();
 
   const leads = Store.getLeads(Object.keys(currentFilters).length ? currentFilters : null);
 
@@ -430,6 +438,7 @@ function showTableView() {
     <table class="data-table">
       <thead>
         <tr>
+          <th style="width:36px"><input type="checkbox" class="bulk-check" id="bulkSelectAll"></th>
           <th>\u5E97\u8217\u540D</th>
           <th>\u696D\u7A2E</th>
           <th>\u4E8B\u696D</th>
@@ -447,6 +456,10 @@ function showTableView() {
   `;
 
   container.appendChild(tableEl);
+
+  // Bind checkbox events
+  initBulkCheckboxes();
+  updateBulkBar();
 }
 
 function buildTableRow(lead) {
@@ -469,7 +482,10 @@ function buildTableRow(lead) {
     feeDisplay = formatCurrency(lead.estimated_fee);
   }
 
-  return `<tr${overdueAttr}>
+  const checked = selectedLeadIds.has(lead.id) ? ' checked' : '';
+
+  return `<tr${overdueAttr} data-lead-id="${lead.id}">
+    <td><input type="checkbox" class="bulk-check bulk-check-row" data-id="${lead.id}"${checked}></td>
     <td style="font-weight:var(--font-medium)">
       <a href="lead-detail.html?id=${lead.id}" style="color:inherit; text-decoration:none;">${escapeHTML(lead.store_name)}</a>
     </td>
@@ -486,6 +502,146 @@ function buildTableRow(lead) {
 function hideTableView() {
   const table = document.getElementById('leadsTableView');
   if (table) table.remove();
+  selectedLeadIds.clear();
+}
+
+// ============================================
+// Bulk Selection Checkboxes
+// ============================================
+function initBulkCheckboxes() {
+  // Header "select all" checkbox
+  const selectAll = document.getElementById('bulkSelectAll');
+  if (selectAll) {
+    selectAll.addEventListener('change', () => {
+      const checks = document.querySelectorAll('.bulk-check-row');
+      checks.forEach(cb => {
+        cb.checked = selectAll.checked;
+        const id = cb.getAttribute('data-id');
+        if (selectAll.checked) {
+          selectedLeadIds.add(id);
+        } else {
+          selectedLeadIds.delete(id);
+        }
+      });
+      updateBulkBar();
+    });
+  }
+
+  // Row checkboxes
+  document.querySelectorAll('.bulk-check-row').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const id = cb.getAttribute('data-id');
+      if (cb.checked) {
+        selectedLeadIds.add(id);
+      } else {
+        selectedLeadIds.delete(id);
+      }
+      // Update "select all" state
+      const allChecks = document.querySelectorAll('.bulk-check-row');
+      const allChecked = [...allChecks].every(c => c.checked);
+      if (selectAll) selectAll.checked = allChecked;
+      updateBulkBar();
+    });
+  });
+}
+
+// ============================================
+// Bulk Action Bar
+// ============================================
+function updateBulkBar() {
+  const count = selectedLeadIds.size;
+  let bar = document.getElementById('bulkActionBar');
+
+  if (count === 0) {
+    if (bar) bar.classList.remove('is-visible');
+    return;
+  }
+
+  if (!bar) {
+    bar = document.createElement('div');
+    bar.id = 'bulkActionBar';
+    bar.className = 'bulk-action-bar';
+    bar.innerHTML = `
+      <span class="bulk-action-bar__count"></span>
+      <button class="btn btn--sm" data-bulk="stage">ステージを一括変更</button>
+      <button class="btn btn--sm btn--danger" data-bulk="delete">一括削除</button>
+      <button class="bulk-action-bar__close" data-bulk="clear">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    `;
+    document.body.appendChild(bar);
+
+    // Bind actions
+    bar.querySelector('[data-bulk="stage"]').addEventListener('click', handleBulkStageChange);
+    bar.querySelector('[data-bulk="delete"]').addEventListener('click', handleBulkDelete);
+    bar.querySelector('[data-bulk="clear"]').addEventListener('click', () => {
+      selectedLeadIds.clear();
+      document.querySelectorAll('.bulk-check').forEach(cb => cb.checked = false);
+      updateBulkBar();
+    });
+  }
+
+  bar.querySelector('.bulk-action-bar__count').textContent = `${count}件を選択中`;
+  // Trigger reflow before adding class for animation
+  bar.offsetHeight;
+  bar.classList.add('is-visible');
+}
+
+function hideBulkBar() {
+  const bar = document.getElementById('bulkActionBar');
+  if (bar) bar.classList.remove('is-visible');
+  selectedLeadIds.clear();
+}
+
+function handleBulkStageChange() {
+  if (selectedLeadIds.size === 0) return;
+
+  const stageOptions = CRM.LEAD_STAGES.map(s => ({ value: s.value, label: s.label }));
+  const body = `
+    <p style="color:var(--color-text-secondary); margin-bottom:var(--space-3); font-size:var(--text-sm);">
+      ${selectedLeadIds.size}件のリードのステージを変更します。
+    </p>
+    ${formGroup('新しいステージ', formSelect('stage', stageOptions))}
+  `;
+
+  openModal({
+    title: 'ステージを一括変更',
+    body,
+    submitLabel: '変更する',
+    onSubmit: (form) => {
+      const data = getFormData(form);
+      const stage = CRM.LEAD_STAGES.find(s => s.value === data.stage);
+
+      selectedLeadIds.forEach(id => {
+        Store.updateLead(id, { stage: data.stage });
+      });
+
+      const count = selectedLeadIds.size;
+      selectedLeadIds.clear();
+      closeModal();
+      renderPipeline();
+      showTableView();
+      updateSidebarBadges();
+      showToast(`${count}件を「${stage ? stage.label : ''}」に変更しました`);
+    }
+  });
+}
+
+function handleBulkDelete() {
+  if (selectedLeadIds.size === 0) return;
+
+  const count = selectedLeadIds.size;
+  if (!confirm(`${count}件のリードを削除しますか？\nこの操作は取り消せません。`)) return;
+
+  selectedLeadIds.forEach(id => {
+    Store.deleteLead(id);
+  });
+
+  selectedLeadIds.clear();
+  renderPipeline();
+  showTableView();
+  updateSidebarBadges();
+  showToast(`${count}件を削除しました`);
 }
 
 // ============================================

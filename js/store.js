@@ -381,7 +381,7 @@ const Store = {
     return raw ? JSON.parse(raw) : {
       profile_name: '上田 琉',
       profile_role: 'admin',
-      profile_email: 'ueda@opus-net.co.jp',
+      profile_email: 'ueda-r@opus-net.net',
       profile_phone: '',
     };
   },
@@ -607,25 +607,11 @@ const Store = {
   _seed() {
     // Reset counters
     localStorage.setItem(this.KEYS.counters, JSON.stringify({
-      lead: 12, client: 3, task: 10, activity: 14
+      lead: 0, client: 3, task: 0, activity: 6
     }));
 
-    // --- Leads ---
-    const leads = [
-      { id: 'lead_0001', store_name: 'Cafe LUNA', company_name: '', business_type: 'sns', store_type: 'concept-cafe', contact_name: '', contact_phone: '', contact_email: '', contact_line: '', sns_instagram: '', sns_tiktok: '', source: 'dm', estimated_plan: 'light', estimated_fee: 150000, area: '新宿', stage: 'list-added', next_date: '', next_action: '', notes: '', assigned_to: 'ueda', converted_to_client: null, created_at: '2026-02-10T10:00:00.000Z', updated_at: '2026-02-10T10:00:00.000Z' },
-      { id: 'lead_0002', store_name: 'Bar GLITCH', company_name: '', business_type: 'sns', store_type: 'bar', contact_name: '', contact_phone: '', contact_email: '', contact_line: '', sns_instagram: '', sns_tiktok: '', source: 'dm', estimated_plan: '', estimated_fee: 0, area: '池袋', stage: 'list-added', next_date: '', next_action: '', notes: '', assigned_to: 'ueda', converted_to_client: null, created_at: '2026-02-11T10:00:00.000Z', updated_at: '2026-02-11T10:00:00.000Z' },
-      { id: 'lead_0003', store_name: 'ガレージK', company_name: '', business_type: 'web', store_type: 'car-dealer', contact_name: '', contact_phone: '', contact_email: '', contact_line: '', sns_instagram: '', sns_tiktok: '', source: 'phone', estimated_plan: '', estimated_fee: 0, area: '埼玉', stage: 'list-added', next_date: '', next_action: '', notes: '', assigned_to: 'ueda', converted_to_client: null, created_at: '2026-02-12T10:00:00.000Z', updated_at: '2026-02-12T10:00:00.000Z' },
-      { id: 'lead_0004', store_name: 'Salon de Noir', company_name: '', business_type: 'sns', store_type: 'concept-cafe', contact_name: '', contact_phone: '', contact_email: '', contact_line: '', sns_instagram: '', sns_tiktok: '', source: 'dm', estimated_plan: '', estimated_fee: 0, area: '歌舞伎町', stage: 'list-added', next_date: '', next_action: '', notes: '', assigned_to: 'ueda', converted_to_client: null, created_at: '2026-02-13T10:00:00.000Z', updated_at: '2026-02-13T10:00:00.000Z' },
-      { id: 'lead_0005', store_name: 'Bar Nocturne', company_name: '', business_type: 'sns', store_type: 'concept-cafe', contact_name: '', contact_phone: '', contact_email: '', contact_line: '', sns_instagram: '', sns_tiktok: '', source: 'dm', estimated_plan: 'light', estimated_fee: 150000, area: '渋谷', stage: 'dm-sent', next_date: '2026-02-23', next_action: 'フォローDM送信', notes: '', assigned_to: 'ueda', converted_to_client: null, created_at: '2026-02-14T10:00:00.000Z', updated_at: '2026-02-20T10:00:00.000Z' },
-      { id: 'lead_0006', store_name: 'Cafe BLOOM', company_name: '', business_type: 'sns', store_type: 'concept-cafe', contact_name: '', contact_phone: '', contact_email: '', contact_line: '', sns_instagram: '', sns_tiktok: '', source: 'dm', estimated_plan: 'light', estimated_fee: 150000, area: '新宿', stage: 'dm-sent', next_date: '2026-02-27', next_action: '返信確認', notes: '', assigned_to: 'ueda', converted_to_client: null, created_at: '2026-02-15T10:00:00.000Z', updated_at: '2026-02-20T10:00:00.000Z' },
-      { id: 'lead_0007', store_name: 'FIT STUDIO 恵比寿', company_name: '', business_type: 'sns', store_type: 'gym', contact_name: '', contact_phone: '', contact_email: '', contact_line: '', sns_instagram: '', sns_tiktok: '', source: 'dm', estimated_plan: 'regular', estimated_fee: 300000, area: '恵比寿', stage: 'dm-sent', next_date: '2026-02-28', next_action: '返信待ち', notes: '', assigned_to: 'ueda', converted_to_client: null, created_at: '2026-02-16T10:00:00.000Z', updated_at: '2026-02-21T10:00:00.000Z' },
-      { id: 'lead_0008', store_name: 'Night Owl', company_name: '', business_type: 'sns', store_type: 'bar', contact_name: '', contact_phone: '', contact_email: '', contact_line: '', sns_instagram: '', sns_tiktok: '', source: 'dm', estimated_plan: 'light', estimated_fee: 150000, area: '六本木', stage: 'replied', next_date: '2026-02-26', next_action: 'アポ打診', notes: '', assigned_to: 'ueda', converted_to_client: null, created_at: '2026-02-12T10:00:00.000Z', updated_at: '2026-02-22T10:00:00.000Z' },
-      { id: 'lead_0009', store_name: 'BODY LAB 横浜', company_name: '', business_type: 'sns', store_type: 'gym', contact_name: '', contact_phone: '', contact_email: '', contact_line: '', sns_instagram: '', sns_tiktok: '', source: 'dm', estimated_plan: 'light', estimated_fee: 150000, area: '横浜', stage: 'replied', next_date: '2026-03-01', next_action: 'ヒアリング', notes: '', assigned_to: 'ueda', converted_to_client: null, created_at: '2026-02-13T10:00:00.000Z', updated_at: '2026-02-23T10:00:00.000Z' },
-      { id: 'lead_0010', store_name: 'Lounge VELVET', company_name: '株式会社VELVET', business_type: 'sns', store_type: 'bar', contact_name: '山田 健太', contact_phone: '03-1234-5678', contact_email: 'yamada@velvet-lounge.com', contact_line: '@velvet-lounge', sns_instagram: '@lounge_velvet', sns_tiktok: '@loungevlvet', source: 'dm', estimated_plan: 'regular', estimated_fee: 300000, area: '六本木', stage: 'appointment-set', next_date: '2026-02-25', next_action: '初回商談（15:00〜）', notes: '六本木エリアのラウンジバー。内装がおしゃれでTikTok映えする空間。\nInstagram投稿は月2-3回程度で不定期。TikTokアカウントは作成済みだが投稿なし。\nターゲット客層は20代後半〜30代の女性グループ。\n\n山田さん（オーナー兼店長）は30代前半。SNSの重要性は理解しているが、運用リソースがないとのこと。\nレギュラープラン（30万/月）に興味を示している。', assigned_to: 'ueda', converted_to_client: null, created_at: '2026-02-15T00:00:00.000Z', updated_at: '2026-02-22T18:30:00.000Z' },
-      { id: 'lead_0011', store_name: 'GLAM BAR 新宿', company_name: '', business_type: 'sns', store_type: 'bar', contact_name: '', contact_phone: '', contact_email: '', contact_line: '', sns_instagram: '', sns_tiktok: '', source: 'dm', estimated_plan: 'full', estimated_fee: 500000, area: '新宿', stage: 'in-meeting', next_date: '2026-02-28', next_action: '提案書準備', notes: '', assigned_to: 'ueda', converted_to_client: null, created_at: '2026-02-08T10:00:00.000Z', updated_at: '2026-02-24T10:00:00.000Z' },
-      { id: 'lead_0012', store_name: 'AXIS AUTO 町田', company_name: '', business_type: 'web', store_type: 'car-dealer', contact_name: '', contact_phone: '', contact_email: '', contact_line: '', sns_instagram: '', sns_tiktok: '', source: 'phone', estimated_plan: 'webcm', estimated_fee: 200000, area: '町田', stage: 'proposal-sent', next_date: '2026-02-25', next_action: '提案書フォローアップ電話', notes: '', assigned_to: 'ueda', converted_to_client: null, created_at: '2026-02-05T10:00:00.000Z', updated_at: '2026-02-23T10:00:00.000Z' },
-    ];
-    this._saveAll('leads', leads);
+    // --- Leads (empty — real data entered by user) ---
+    this._saveAll('leads', []);
 
     // --- Clients ---
     const clients = [
@@ -635,41 +621,17 @@ const Store = {
     ];
     this._saveAll('clients', clients);
 
-    // --- Tasks ---
-    const tasks = [
-      { id: 'task_0001', title: '月次レポート作成・送付', client_id: 'client_0001', lead_id: '', task_type: 'report', status: 'todo', priority: 'high', due_date: '2026-02-24', completed_date: '', assigned_to: 'ueda', notes: '', created_at: '2026-02-20T10:00:00.000Z', updated_at: '2026-02-20T10:00:00.000Z' },
-      { id: 'task_0002', title: '月次MTG実施', client_id: 'client_0001', lead_id: '', task_type: 'meeting', status: 'todo', priority: 'high', due_date: '2026-03-01', completed_date: '', assigned_to: 'ueda', notes: '', created_at: '2026-02-20T10:00:00.000Z', updated_at: '2026-02-20T10:00:00.000Z' },
-      { id: 'task_0003', title: '3月リール撮影スケジュール確定', client_id: 'client_0002', lead_id: '', task_type: 'shoot', status: 'todo', priority: 'medium', due_date: '2026-02-28', completed_date: '', assigned_to: 'ueda', notes: '', created_at: '2026-02-20T10:00:00.000Z', updated_at: '2026-02-20T10:00:00.000Z' },
-      { id: 'task_0004', title: '3月分 企画・台本作成', client_id: 'client_0003', lead_id: '', task_type: 'general', status: 'todo', priority: 'medium', due_date: '2026-03-05', completed_date: '', assigned_to: 'ueda', notes: '', created_at: '2026-02-20T10:00:00.000Z', updated_at: '2026-02-20T10:00:00.000Z' },
-      { id: 'task_0005', title: '提案書フォローアップ電話', client_id: '', lead_id: 'lead_0012', task_type: 'general', status: 'todo', priority: 'medium', due_date: '2026-02-25', completed_date: '', assigned_to: 'ueda', notes: '', created_at: '2026-02-20T10:00:00.000Z', updated_at: '2026-02-20T10:00:00.000Z' },
-      { id: 'task_0006', title: '2月分 動画編集（8本）', client_id: 'client_0001', lead_id: '', task_type: 'edit', status: 'in-progress', priority: 'medium', due_date: '2026-02-28', completed_date: '', assigned_to: 'kurihara', notes: '', created_at: '2026-02-15T10:00:00.000Z', updated_at: '2026-02-20T10:00:00.000Z' },
-      { id: 'task_0007', title: 'Instagramリール 2月後半分', client_id: 'client_0002', lead_id: '', task_type: 'edit', status: 'in-progress', priority: 'low', due_date: '2026-02-28', completed_date: '', assigned_to: 'kurihara', notes: '', created_at: '2026-02-15T10:00:00.000Z', updated_at: '2026-02-20T10:00:00.000Z' },
-      { id: 'task_0008', title: '2月分 企画・台本作成（8本）', client_id: 'client_0001', lead_id: '', task_type: 'general', status: 'done', priority: 'medium', due_date: '2026-02-10', completed_date: '2026-02-10', assigned_to: 'ueda', notes: '', created_at: '2026-02-01T10:00:00.000Z', updated_at: '2026-02-10T10:00:00.000Z' },
-      { id: 'task_0009', title: '2月分 撮影（8本）', client_id: 'client_0001', lead_id: '', task_type: 'shoot', status: 'done', priority: 'medium', due_date: '2026-02-15', completed_date: '2026-02-15', assigned_to: 'ueda', notes: '', created_at: '2026-02-01T10:00:00.000Z', updated_at: '2026-02-15T10:00:00.000Z' },
-      { id: 'task_0010', title: 'Roenアカウント初期設定', client_id: 'client_0003', lead_id: '', task_type: 'general', status: 'done', priority: 'medium', due_date: '2026-02-05', completed_date: '2026-02-05', assigned_to: 'ueda', notes: '', created_at: '2026-01-20T10:00:00.000Z', updated_at: '2026-02-05T10:00:00.000Z' },
-    ];
-    this._saveAll('tasks', tasks);
+    // --- Tasks (empty — real tasks entered by user) ---
+    this._saveAll('tasks', []);
 
-    // --- Activities ---
+    // --- Activities (real client history only) ---
     const activities = [
-      // Lounge VELVET
-      { id: 'activity_0001', entity_type: 'lead', entity_id: 'lead_0010', activity_type: 'meeting', summary: 'Instagram DMで商談日程を確定。2/25 15:00〜 六本木の店舗で初回商談。レギュラープランに興味あり。', next_date: '2026-02-25', next_action: '初回商談', created_by: 'ueda', created_at: '2026-02-22T18:30:00.000Z' },
-      { id: 'activity_0002', entity_type: 'lead', entity_id: 'lead_0010', activity_type: 'dm', summary: '先方から返信あり。「TikTokの運用に興味がある。一度話を聞きたい」とのこと。', next_date: '', next_action: '', created_by: 'ueda', created_at: '2026-02-20T14:00:00.000Z' },
-      { id: 'activity_0003', entity_type: 'lead', entity_id: 'lead_0010', activity_type: 'dm', summary: 'Instagramから初回営業DM送信。アカウント分析に基づく具体的な改善提案を添付。', next_date: '', next_action: '', created_by: 'ueda', created_at: '2026-02-18T10:00:00.000Z' },
-      { id: 'activity_0004', entity_type: 'lead', entity_id: 'lead_0010', activity_type: 'note', summary: 'TikTokで発見。六本木エリアのラウンジバー。Instagram投稿は不定期、TikTokはアカウントあるが未運用。ポテンシャルあり。', next_date: '', next_action: '', created_by: 'ueda', created_at: '2026-02-15T00:00:00.000Z' },
-      // ふららぼ
-      { id: 'activity_0005', entity_type: 'client', entity_id: 'client_0001', activity_type: 'meeting', summary: '撮影日程の調整MTG。3/5に撮影確定。3月の企画案も共有済み。', next_date: '2026-03-01', next_action: '月次MTG', created_by: 'ueda', created_at: '2026-02-25T14:00:00.000Z' },
-      { id: 'activity_0006', entity_type: 'client', entity_id: 'client_0001', activity_type: 'note', summary: '2月分の撮影完了（8本）。栗原さんに編集依頼済み。', next_date: '', next_action: '', created_by: 'ueda', created_at: '2026-02-15T00:00:00.000Z' },
-      { id: 'activity_0007', entity_type: 'client', entity_id: 'client_0001', activity_type: 'meeting', summary: '1月分のレポート報告。TikTokフォロワー+320、エンゲージメント率4.2%。先方満足度高い。', next_date: '', next_action: '', created_by: 'ueda', created_at: '2026-02-03T15:00:00.000Z' },
-      { id: 'activity_0008', entity_type: 'client', entity_id: 'client_0001', activity_type: 'email', summary: '月次レポート送付。1月の実績まとめと2月の企画案を添付。', next_date: '', next_action: '', created_by: 'ueda', created_at: '2026-01-28T00:00:00.000Z' },
-      // Other leads
-      { id: 'activity_0009', entity_type: 'lead', entity_id: 'lead_0001', activity_type: 'dm', summary: '初回DM送信。TikTok運用の提案', next_date: '2026-02-27', next_action: '返信確認', created_by: 'ueda', created_at: '2026-02-27T10:30:00.000Z' },
-      { id: 'activity_0010', entity_type: 'lead', entity_id: 'lead_0012', activity_type: 'call', summary: '提案書送付後のフォロー電話。来週返答予定', next_date: '2026-02-25', next_action: 'フォローアップ電話', created_by: 'ueda', created_at: '2026-02-26T16:45:00.000Z' },
-      { id: 'activity_0011', entity_type: 'lead', entity_id: 'lead_0005', activity_type: 'dm', summary: 'DM返信あり。興味ありとのこと', next_date: '2026-02-23', next_action: 'フォローDM送信', created_by: 'ueda', created_at: '2026-02-26T11:20:00.000Z' },
-      { id: 'activity_0012', entity_type: 'client', entity_id: 'client_0002', activity_type: 'note', summary: '3月のリール撮影スケジュール確認', next_date: '', next_action: '', created_by: 'ueda', created_at: '2026-02-23T09:00:00.000Z' },
-      // Additional for completeness
-      { id: 'activity_0013', entity_type: 'lead', entity_id: 'lead_0008', activity_type: 'dm', summary: 'DM返信あり。興味あるが今月は忙しいとのこと。来月アポ打診予定。', next_date: '2026-02-26', next_action: 'アポ打診', created_by: 'ueda', created_at: '2026-02-21T10:00:00.000Z' },
-      { id: 'activity_0014', entity_type: 'lead', entity_id: 'lead_0011', activity_type: 'meeting', summary: '初回商談実施。フルプランで検討中。来週提案書を準備する。', next_date: '2026-02-28', next_action: '提案書準備', created_by: 'ueda', created_at: '2026-02-24T10:00:00.000Z' },
+      { id: 'activity_0001', entity_type: 'client', entity_id: 'client_0001', activity_type: 'meeting', summary: '撮影日程の調整MTG。3/5に撮影確定。3月の企画案も共有済み。', next_date: '2026-03-01', next_action: '月次MTG', created_by: 'ueda', created_at: '2026-02-25T14:00:00.000Z' },
+      { id: 'activity_0002', entity_type: 'client', entity_id: 'client_0001', activity_type: 'note', summary: '2月分の撮影完了（8本）。栗原さんに編集依頼済み。', next_date: '', next_action: '', created_by: 'ueda', created_at: '2026-02-15T00:00:00.000Z' },
+      { id: 'activity_0003', entity_type: 'client', entity_id: 'client_0001', activity_type: 'meeting', summary: '1月分のレポート報告。TikTokフォロワー+320、エンゲージメント率4.2%。先方満足度高い。', next_date: '', next_action: '', created_by: 'ueda', created_at: '2026-02-03T15:00:00.000Z' },
+      { id: 'activity_0004', entity_type: 'client', entity_id: 'client_0001', activity_type: 'email', summary: '月次レポート送付。1月の実績まとめと2月の企画案を添付。', next_date: '', next_action: '', created_by: 'ueda', created_at: '2026-01-28T00:00:00.000Z' },
+      { id: 'activity_0005', entity_type: 'client', entity_id: 'client_0002', activity_type: 'note', summary: '3月のリール撮影スケジュール確認', next_date: '', next_action: '', created_by: 'ueda', created_at: '2026-02-23T09:00:00.000Z' },
+      { id: 'activity_0006', entity_type: 'client', entity_id: 'client_0003', activity_type: 'note', summary: 'Roenアカウント初期設定完了', next_date: '', next_action: '', created_by: 'ueda', created_at: '2026-02-05T00:00:00.000Z' },
     ];
     this._saveAll('activities', activities);
   },

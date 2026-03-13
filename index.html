@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2563eb">
+  <link rel="apple-touch-icon" href="assets/icon-192.svg">
   <title>ダッシュボード - Opus CRM</title>
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/base.css">
@@ -119,14 +122,42 @@
           </div>
         </div>
 
+        <!-- Analytics Section -->
+        <section class="section" id="analyticsSection">
+          <div class="section__header">
+            <h2 class="section__title">分析</h2>
+          </div>
+          <div class="analytics-grid">
+            <div class="analytics-card">
+              <div class="analytics-card__title">パイプライン（ステージ別リード数）</div>
+              <div class="analytics-card__chart">
+                <canvas id="chartPipeline"></canvas>
+              </div>
+            </div>
+            <div class="analytics-card">
+              <div class="analytics-card__title">月額内訳（プラン別）</div>
+              <div class="analytics-card__chart analytics-card__chart--sm">
+                <canvas id="chartRevenue"></canvas>
+              </div>
+            </div>
+            <div class="analytics-card analytics-card--full">
+              <div class="analytics-card__title">担当者別KPI</div>
+              <div id="kpiTable"></div>
+            </div>
+          </div>
+        </section>
+
       </div>
     </main>
 
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="js/config.js"></script>
   <script src="js/store.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/dashboard.js"></script>
+  <script src="js/shortcuts.js"></script>
+  <script>if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');</script>
 </body>
 </html>

@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2563eb">
+  <link rel="apple-touch-icon" href="assets/icon-192.svg">
   <title>設定 - Opus CRM</title>
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/base.css">
@@ -109,7 +112,7 @@
                 <div class="form-row">
                   <div class="form-group">
                     <label class="form-label">メールアドレス</label>
-                    <input type="email" class="form-input" id="profileEmail" value="ueda@opus-net.co.jp">
+                    <input type="email" class="form-input" id="profileEmail" value="ueda-r@opus-net.net">
                   </div>
                   <div class="form-group">
                     <label class="form-label">電話番号</label>
@@ -260,6 +263,38 @@
                     </div>
                     <button class="btn btn--secondary btn--sm" data-action="export-json">バックアップ</button>
                   </div>
+                  <div style="display:flex; align-items:center; justify-content:space-between; padding:var(--space-3) var(--space-4); border:1px solid var(--color-border); border-radius:var(--radius-lg);">
+                    <div>
+                      <div style="font-size:var(--text-sm); font-weight:var(--font-medium);">JSONから復元</div>
+                      <div style="font-size:var(--text-xs); color:var(--color-text-tertiary);">バックアップファイルからデータを復元します</div>
+                    </div>
+                    <label class="btn btn--secondary btn--sm" style="cursor:pointer;">
+                      復元
+                      <input type="file" id="jsonImportInput" accept=".json" style="display:none;">
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- CSV Import -->
+              <div class="settings-section">
+                <div class="settings-section__title">CSVインポート</div>
+                <div class="settings-section__desc">CSVファイルからリードやクライアントを一括登録します</div>
+                <div id="csvImportArea">
+                  <div style="display:flex; gap:var(--space-3); align-items:end;">
+                    <div class="form-group" style="flex:1; margin-bottom:0;">
+                      <label class="form-label">インポート先</label>
+                      <select class="form-input" id="importTarget">
+                        <option value="leads">リード</option>
+                        <option value="clients">クライアント</option>
+                      </select>
+                    </div>
+                    <div class="form-group" style="flex:2; margin-bottom:0;">
+                      <label class="form-label">CSVファイル</label>
+                      <input type="file" class="form-input" id="csvFileInput" accept=".csv" style="padding:6px;">
+                    </div>
+                  </div>
+                  <div id="csvPreview" style="display:none; margin-top:var(--space-4);"></div>
                 </div>
               </div>
 
@@ -281,5 +316,7 @@
   <script src="js/store.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/settings.js"></script>
+  <script src="js/shortcuts.js"></script>
+  <script>if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');</script>
 </body>
 </html>
