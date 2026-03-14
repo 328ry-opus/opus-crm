@@ -9,12 +9,7 @@ let currentId = null;
 let currentType = null; // 'lead' or 'client'
 let currentRecord = null;
 
-// --- XSS helper ---
-function escapeHtml(str) {
-  if (!str) return '';
-  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-  return String(str).replace(/[&<>"']/g, c => map[c]);
-}
+// escapeHtml() is defined in ui.js (shared)
 
 // --- SVG icon constants ---
 const ICON_SVGS = {
@@ -150,9 +145,9 @@ function renderLeadDetail(lead) {
   // --- Detail Header ---
   const detailHeader = document.querySelector('.detail-header');
   if (detailHeader) {
-    const storeType = lookupLabel(CRM.STORE_TYPES, lead.store_type);
+    const storeType = lookupLabel(getAllStoreTypes(), lead.store_type);
     const bizType = lookupLabel(CRM.BUSINESS_TYPES, lead.business_type);
-    const source = lookupLabel(CRM.SOURCES, lead.source);
+    const source = lookupLabel(getAllSources(), lead.source);
     const feeLabel = lead.estimated_fee ? `見込み ${formatCurrency(lead.estimated_fee)}/月` : '';
 
     detailHeader.innerHTML = `
@@ -190,7 +185,7 @@ function renderLeadDetail(lead) {
         ${buildInfoSection(SECTION_ICONS.store, '店舗情報', [
           ['店舗名', escapeHtml(lead.store_name)],
           ['企業名', escapeHtml(lead.company_name) || '—'],
-          ['業種', escapeHtml(lookupLabel(CRM.STORE_TYPES, lead.store_type)) || '—'],
+          ['業種', escapeHtml(lookupLabel(getAllStoreTypes(), lead.store_type)) || '—'],
           ['エリア', escapeHtml(lead.area) || '—'],
         ])}
         ${buildInfoSection(SECTION_ICONS.contact, '連絡先', [
@@ -204,9 +199,9 @@ function renderLeadDetail(lead) {
           ['TikTok', lead.sns_tiktok ? `<a href="#">${escapeHtml(lead.sns_tiktok)}</a>` : '—'],
         ])}
         ${buildInfoSection(SECTION_ICONS.finance, '見込み情報', [
-          ['見込みプラン', escapeHtml(lookupLabel(CRM.PLANS, lead.estimated_plan)) || '未定'],
+          ['見込みプラン', escapeHtml(lookupLabel(getAllPlans(), lead.estimated_plan)) || '未定'],
           ['見込み月額', lead.estimated_fee ? `<span class="info-grid__value--primary">${formatCurrency(lead.estimated_fee)}/月</span>` : '—'],
-          ['ソース', escapeHtml(lookupLabel(CRM.SOURCES, lead.source)) || '—'],
+          ['ソース', escapeHtml(lookupLabel(getAllSources(), lead.source)) || '—'],
           ['リスト追加日', formatFullDate(lead.created_at)],
         ])}
       </div>
@@ -290,7 +285,7 @@ function renderClientDetail(client) {
   const detailHeader = document.querySelector('.detail-header');
   if (detailHeader) {
     const bizType = lookupLabel(CRM.BUSINESS_TYPES, client.business_type);
-    const storeType = lookupLabel(CRM.STORE_TYPES, client.store_type);
+    const storeType = lookupLabel(getAllStoreTypes(), client.store_type);
     const feeLabel = client.monthly_fee ? formatCurrency(client.monthly_fee) + '/月' : '';
 
     detailHeader.innerHTML = `
@@ -314,7 +309,7 @@ function renderClientDetail(client) {
   const pageContent = document.querySelector('.page-content');
   const detailBody = document.querySelector('.detail-body');
   if (pageContent && detailBody) {
-    const plan = CRM.PLANS.find(p => p.value === client.plan);
+    const plan = getAllPlans().find(p => p.value === client.plan);
     const planLabel = plan ? plan.label.replace('プラン', '') : '—';
     const feeVal = client.monthly_fee ? formatCurrency(client.monthly_fee) : '—';
     const startStr = client.contract_start ? formatFullDate(client.contract_start).slice(0, 7).replace('-', '/') : '';
@@ -349,7 +344,7 @@ function renderClientDetail(client) {
   if (mainArea) {
     const activities = Store.getActivities('client', client.id);
     const tasks = Store.getTasksForClient(client.id);
-    const plan = CRM.PLANS.find(p => p.value === client.plan);
+    const plan = getAllPlans().find(p => p.value === client.plan);
 
     mainArea.innerHTML = `
       <div class="tabs">
@@ -363,7 +358,7 @@ function renderClientDetail(client) {
         ${buildInfoSection(SECTION_ICONS.store, '基本情報', [
           ['店舗名', escapeHtml(client.store_name)],
           ['運営会社', escapeHtml(client.company_name) || '—'],
-          ['業種', escapeHtml(lookupLabel(CRM.STORE_TYPES, client.store_type)) || '—'],
+          ['業種', escapeHtml(lookupLabel(getAllStoreTypes(), client.store_type)) || '—'],
           ['担当者', escapeHtml(client.contact_name) || '—'],
           ['電話', client.contact_phone ? `<a href="tel:${escapeHtml(client.contact_phone)}">${escapeHtml(client.contact_phone)}</a>` : '—'],
           ['メール', client.contact_email ? `<a href="mailto:${escapeHtml(client.contact_email)}">${escapeHtml(client.contact_email)}</a>` : '—'],
@@ -520,7 +515,7 @@ function renderTaskList(tasks) {
     const isDone = t.status === 'done';
     const priority = CRM.PRIORITIES.find(p => p.value === t.priority);
     const taskType = CRM.TASK_TYPES.find(tt => tt.value === t.task_type);
-    const assignee = CRM.ASSIGNEES.find(a => a.value === t.assigned_to);
+    const assignee = getAllAssignees().find(a => a.value === t.assigned_to);
     const dateLabel = isDone && t.completed_date
       ? `完了: ${formatDate(t.completed_date)}`
       : (t.due_date ? `期限: ${formatDate(t.due_date)}` : '');
@@ -667,7 +662,7 @@ function openEditLeadModal() {
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
       ${formGroup('事業種別', formSelect('business_type', CRM.BUSINESS_TYPES, lead.business_type))}
-      ${formGroup('業種', formSelect('store_type', [{ value: '', label: '選択してください' }, ...CRM.STORE_TYPES], lead.store_type))}
+      ${formGroup('業種', formSelect('store_type', [{ value: '', label: '選択してください' }, ...getAllStoreTypes()], lead.store_type))}
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
       ${formGroup('担当者名', formInput('contact_name', '例: 山田太郎', 'text', lead.contact_name))}
@@ -682,12 +677,12 @@ function openEditLeadModal() {
       ${formGroup('TikTok', formInput('sns_tiktok', '例: @bar.nocturne', 'text', lead.sns_tiktok))}
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
-      ${formGroup('ソース', formSelect('source', CRM.SOURCES, lead.source))}
-      ${formGroup('見込みプラン', formSelect('estimated_plan', [{ value: '', label: '未定' }, ...CRM.PLANS.map(p => ({ value: p.value, label: p.label + (p.fee ? ` (${formatCurrency(p.fee)})` : '') }))], lead.estimated_plan))}
+      ${formGroup('ソース', formSelect('source', getAllSources(), lead.source))}
+      ${formGroup('見込みプラン', formSelect('estimated_plan', [{ value: '', label: '未定' }, ...getAllPlans().map(p => ({ value: p.value, label: p.label + (p.fee ? ` (${formatCurrency(p.fee)})` : '') }))], lead.estimated_plan))}
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
       ${formGroup('見込み月額', formInput('estimated_fee', '例: 300000', 'number', lead.estimated_fee || ''))}
-      ${formGroup('担当', formSelect('assigned_to', CRM.ASSIGNEES.map(a => ({ value: a.value, label: a.label })), lead.assigned_to))}
+      ${formGroup('担当', formSelect('assigned_to', getAllAssignees().map(a => ({ value: a.value, label: a.label })), lead.assigned_to))}
     </div>
     ${formGroup('エリア', formInput('area', '例: 渋谷、六本木', 'text', lead.area))}
     ${formGroup('メモ', formTextarea('notes', 'リードに関するメモを入力...', lead.notes))}
@@ -726,7 +721,7 @@ function openEditClientModal() {
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
       ${formGroup('事業種別', formSelect('business_type', CRM.BUSINESS_TYPES, client.business_type))}
-      ${formGroup('業種', formSelect('store_type', [{ value: '', label: '選択してください' }, ...CRM.STORE_TYPES], client.store_type))}
+      ${formGroup('業種', formSelect('store_type', [{ value: '', label: '選択してください' }, ...getAllStoreTypes()], client.store_type))}
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
       ${formGroup('担当者名', formInput('contact_name', '', 'text', client.contact_name))}
@@ -741,7 +736,7 @@ function openEditClientModal() {
       ${formGroup('TikTok', formInput('sns_tiktok', '', 'text', client.sns_tiktok))}
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
-      ${formGroup('プラン', formSelect('plan', CRM.PLANS.map(p => ({ value: p.value, label: p.label })), client.plan))}
+      ${formGroup('プラン', formSelect('plan', getAllPlans().map(p => ({ value: p.value, label: p.label })), client.plan))}
       ${formGroup('月額', formInput('monthly_fee', '例: 300000', 'number', client.monthly_fee || ''))}
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
@@ -750,7 +745,7 @@ function openEditClientModal() {
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
       ${formGroup('ステータス', formSelect('status', CRM.CLIENT_STATUSES.map(s => ({ value: s.value, label: s.label })), client.status))}
-      ${formGroup('担当', formSelect('assigned_to', CRM.ASSIGNEES.map(a => ({ value: a.value, label: a.label })), client.assigned_to))}
+      ${formGroup('担当', formSelect('assigned_to', getAllAssignees().map(a => ({ value: a.value, label: a.label })), client.assigned_to))}
     </div>
     ${formGroup('エリア', formInput('area', '', 'text', client.area))}
     ${formGroup('メモ', formTextarea('notes', '', client.notes))}
@@ -887,9 +882,9 @@ function renderLeadHeader(lead) {
   const detailHeader = document.querySelector('.detail-header');
   if (!detailHeader) return;
 
-  const storeType = lookupLabel(CRM.STORE_TYPES, lead.store_type);
+  const storeType = lookupLabel(getAllStoreTypes(), lead.store_type);
   const bizType = lookupLabel(CRM.BUSINESS_TYPES, lead.business_type);
-  const source = lookupLabel(CRM.SOURCES, lead.source);
+  const source = lookupLabel(getAllSources(), lead.source);
   const feeLabel = lead.estimated_fee ? `見込み ${formatCurrency(lead.estimated_fee)}/月` : '';
 
   detailHeader.innerHTML = `
@@ -952,7 +947,7 @@ function openConvertModal() {
     <p style="color:var(--color-text-secondary); margin-bottom:var(--space-4); font-size:var(--text-sm);">
       <strong>${escapeHtml(lead.store_name)}</strong> を成約としてクライアントに登録します。
     </p>
-    ${formGroup('契約プラン', formSelect('plan', CRM.PLANS.map(p => ({
+    ${formGroup('契約プラン', formSelect('plan', getAllPlans().map(p => ({
       value: p.value,
       label: p.label + (p.fee ? ` (${formatCurrency(p.fee)}/月)` : '')
     })), lead.estimated_plan || ''))}
@@ -997,7 +992,7 @@ function openConvertModal() {
     const feeInput = modal.querySelector('[name="monthly_fee"]');
     if (planSelect && feeInput) {
       planSelect.addEventListener('change', () => {
-        const plan = CRM.PLANS.find(p => p.value === planSelect.value);
+        const plan = getAllPlans().find(p => p.value === planSelect.value);
         if (plan && plan.fee) feeInput.value = plan.fee;
       });
     }
@@ -1017,13 +1012,13 @@ function openQuickTaskModal() {
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
       ${formGroup('期限', formInput('due_date', '', 'date'))}
-      ${formGroup('担当者', formSelect('assigned_to', [{ value: '', label: '未割当' }, ...CRM.ASSIGNEES.map(a => ({ value: a.value, label: a.label }))]))}
+      ${formGroup('担当者', formSelect('assigned_to', [{ value: '', label: '未割当' }, ...getAllAssignees().map(a => ({ value: a.value, label: a.label }))]))}
     </div>
     ${formGroup('メモ', formTextarea('notes', ''))}
   `;
 
   openModal({
-    title: `タスク追加 — ${escapeHtml(currentRecord.store_name)}`,
+    title: `タスク追加 — ${currentRecord.store_name}`,
     body,
     submitLabel: '追加',
     onSubmit: (form) => {

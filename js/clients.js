@@ -38,7 +38,7 @@ function renderClients() {
     const bizLabel = bizType ? bizType.label : '';
 
     // Plan name (strip "プラン" suffix for compact display)
-    const plan = CRM.PLANS.find(p => p.value === client.plan);
+    const plan = getAllPlans().find(p => p.value === client.plan);
     const planLabel = plan ? plan.label.replace('プラン', '') : '';
 
     // Monthly fee
@@ -104,8 +104,8 @@ function initPlanFilter() {
   const planSelect = document.getElementById('filterPlan');
   if (!planSelect) return;
 
-  // Populate plan options from CRM config
-  CRM.PLANS.forEach(p => {
+  // Populate plan options (built-in + custom)
+  getAllPlans().forEach(p => {
     const opt = document.createElement('option');
     opt.value = p.value;
     opt.textContent = p.label;
@@ -165,7 +165,7 @@ function openNewClientModal() {
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
       ${formGroup('サービス', formSelect('business_type', CRM.BUSINESS_TYPES))}
-      ${formGroup('プラン', formSelect('plan', [{ value: '', label: '選択してください' }, ...CRM.PLANS.map(p => ({ value: p.value, label: p.label + (p.fee ? ' (' + formatCurrency(p.fee) + ')' : '') }))]))}
+      ${formGroup('プラン', formSelect('plan', [{ value: '', label: '選択してください' }, ...getAllPlans().map(p => ({ value: p.value, label: p.label + (p.fee ? ' (' + formatCurrency(p.fee) + ')' : '') }))]))}
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
       ${formGroup('月額', formInput('monthly_fee', '例: 300000', 'number'))}
@@ -193,7 +193,7 @@ function openNewClientModal() {
 
       // If no fee entered but plan selected, auto-fill from plan config
       if (!data.monthly_fee && data.plan) {
-        const plan = CRM.PLANS.find(p => p.value === data.plan);
+        const plan = getAllPlans().find(p => p.value === data.plan);
         if (plan && plan.fee) data.monthly_fee = plan.fee;
       }
 
@@ -215,7 +215,7 @@ function setupPlanAutoFill(modalEl) {
   if (!planSelect || !feeInput) return;
 
   planSelect.addEventListener('change', () => {
-    const selected = CRM.PLANS.find(p => p.value === planSelect.value);
+    const selected = getAllPlans().find(p => p.value === planSelect.value);
     if (selected && selected.fee) {
       feeInput.value = selected.fee;
     }
@@ -269,10 +269,4 @@ function buildNextDateHtml(dateStr) {
   return `<span class="next-date next-date--upcoming">${formatted}</span>`;
 }
 
-// Escape HTML to prevent XSS
-function escapeHtml(str) {
-  if (!str) return '';
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
-}
+// escapeHtml() is defined in ui.js (shared)

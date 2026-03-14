@@ -1,56 +1,37 @@
 /* ========================================
-   Opus CRM — Data Store (localStorage)
-   All CRUD operations and data persistence
+   Opus CRM — Data Store
+   Business logic layer. Delegates storage to Repository.
+   Currently synchronous (localStorage). When migrating to
+   Supabase, make these methods async and await Repository calls.
    ======================================== */
 
 const Store = {
-  // --- Cache ---
-  _cache: {},
-
-  // --- localStorage keys ---
-  KEYS: {
-    leads: 'opus_crm_leads',
-    clients: 'opus_crm_clients',
-    tasks: 'opus_crm_tasks',
-    activities: 'opus_crm_activities',
-    settings: 'opus_crm_settings',
-    counters: 'opus_crm_counters',
-    initialized: 'opus_crm_initialized',
-  },
+  // Expose KEYS for backward compatibility (settings import/export)
+  get KEYS() { return Repository.KEYS; },
 
   // ============================================
   // Initialization
   // ============================================
   init() {
-    if (!localStorage.getItem(this.KEYS.initialized)) {
+    if (!Repository.isInitialized()) {
       this._seed();
-      localStorage.setItem(this.KEYS.initialized, 'true');
+      Repository.markInitialized();
     }
   },
 
   // ============================================
-  // Internal helpers
+  // Internal helpers (delegate to Repository)
   // ============================================
   _getAll(key) {
-    if (this._cache[key]) return this._cache[key];
-    const raw = localStorage.getItem(this.KEYS[key]);
-    const data = raw ? JSON.parse(raw) : [];
-    this._cache[key] = data;
-    return data;
+    return Repository.getAllSync(key);
   },
 
   _saveAll(key, data) {
-    this._cache[key] = data;
-    localStorage.setItem(this.KEYS[key], JSON.stringify(data));
+    Repository.saveAllSync(key, data);
   },
 
   _generateId(type) {
-    const counters = JSON.parse(localStorage.getItem(this.KEYS.counters) || '{}');
-    const current = counters[type] || 0;
-    const next = current + 1;
-    counters[type] = next;
-    localStorage.setItem(this.KEYS.counters, JSON.stringify(counters));
-    return `${type}_${String(next).padStart(4, '0')}`;
+    return Repository.generateIdSync(type);
   },
 
   _now() {
@@ -157,7 +138,7 @@ const Store = {
     if (!lead) return null;
 
     // Create client from lead data
-    const plan = CRM.PLANS.find(p => p.value === contractData.plan);
+    const plan = getAllPlans().find(p => p.value === contractData.plan);
     const client = this.addClient({
       store_name: lead.store_name,
       company_name: lead.company_name,
@@ -266,9 +247,13 @@ const Store = {
     let clients = this._getAll('clients');
     clients = clients.filter(c => c.id !== id);
     this._saveAll('clients', clients);
+    // Clean up related data
     let activities = this._getAll('activities');
     activities = activities.filter(a => !(a.entity_type === 'client' && a.entity_id === id));
     this._saveAll('activities', activities);
+    let tasks = this._getAll('tasks');
+    tasks = tasks.filter(t => t.client_id !== id);
+    this._saveAll('tasks', tasks);
   },
 
   // ============================================
@@ -374,20 +359,14 @@ const Store = {
   },
 
   // ============================================
-  // Settings
+  // Settings (delegate to Repository)
   // ============================================
   getSettings() {
-    const raw = localStorage.getItem(this.KEYS.settings);
-    return raw ? JSON.parse(raw) : {
-      profile_name: '上田 琉',
-      profile_role: 'admin',
-      profile_email: 'ueda-r@opus-net.net',
-      profile_phone: '',
-    };
+    return Repository.getSettingsSync();
   },
 
   saveSettings(data) {
-    localStorage.setItem(this.KEYS.settings, JSON.stringify(data));
+    Repository.saveSettingsSync(data);
   },
 
   // ============================================
@@ -400,7 +379,6 @@ const Store = {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Count actions due today or overdue
     let actionCount = 0;
     let overdueCount = 0;
     leads.forEach(l => {
@@ -418,16 +396,12 @@ const Store = {
       }
     });
 
-    // Active pipeline leads (not list-added, won, lost)
     const activeStages = ['dm-sent', 'replied', 'appointment-set', 'in-meeting', 'proposal-sent'];
     const pipelineLeads = leads.filter(l => activeStages.includes(l.stage));
-
-    // Active clients
     const activeClients = clients.filter(c => c.status === 'active');
     const snsClients = activeClients.filter(c => c.business_type === 'sns' || c.business_type === 'both').length;
     const webClients = activeClients.filter(c => c.business_type === 'web' || c.business_type === 'both').length;
 
-    // Pipeline value
     const leadValue = leads
       .filter(l => !['won', 'lost'].includes(l.stage))
       .reduce((sum, l) => sum + (l.estimated_fee || 0), 0);
@@ -451,7 +425,6 @@ const Store = {
     today.setHours(0, 0, 0, 0);
     const items = [];
 
-    // Leads with next_date <= today
     leads.forEach(l => {
       if (l.stage === 'won' || l.stage === 'lost') return;
       if (!l.next_date) return;
@@ -459,26 +432,19 @@ const Store = {
       if (d <= today) {
         const stage = CRM.LEAD_STAGES.find(s => s.value === l.stage);
         items.push({
-          type: 'lead',
-          id: l.id,
-          name: l.store_name,
-          sub: `${l.store_type ? (CRM.STORE_TYPES.find(t => t.value === l.store_type)?.label || '') : ''}${l.area ? '・' + l.area : ''}`,
-          status: stage ? stage.label : '',
-          statusBadge: l.stage,
-          date: l.next_date,
-          action: l.next_action || '',
-          isOverdue: d < today,
+          type: 'lead', id: l.id, name: l.store_name,
+          sub: `${l.store_type ? (getAllStoreTypes().find(t => t.value === l.store_type)?.label || '') : ''}${l.area ? '・' + l.area : ''}`,
+          status: stage ? stage.label : '', statusBadge: l.stage,
+          date: l.next_date, action: l.next_action || '', isOverdue: d < today,
         });
       }
     });
 
-    // Tasks with due_date <= today and not done
     tasks.forEach(t => {
       if (t.status === 'done') return;
       if (!t.due_date) return;
       const d = new Date(t.due_date); d.setHours(0, 0, 0, 0);
       if (d <= today) {
-        // Find related entity name
         let entityName = '';
         if (t.client_id) {
           const c = this.getClient(t.client_id);
@@ -488,22 +454,14 @@ const Store = {
           if (l) entityName = l.store_name + '（リード）';
         }
         items.push({
-          type: 'task',
-          id: t.id,
-          name: t.title,
-          sub: entityName,
-          status: t.status === 'in-progress' ? '進行中' : 'Todo',
-          statusBadge: t.status,
-          date: t.due_date,
-          action: '',
-          isOverdue: d < today,
-          client_id: t.client_id,
-          lead_id: t.lead_id,
+          type: 'task', id: t.id, name: t.title, sub: entityName,
+          status: t.status === 'in-progress' ? '進行中' : 'Todo', statusBadge: t.status,
+          date: t.due_date, action: '', isOverdue: d < today,
+          client_id: t.client_id, lead_id: t.lead_id,
         });
       }
     });
 
-    // Clients with next_date <= today
     const clients = this._getAll('clients');
     clients.forEach(c => {
       if (c.status !== 'active') return;
@@ -512,25 +470,18 @@ const Store = {
       if (d <= today) {
         const biz = CRM.BUSINESS_TYPES.find(b => b.value === c.business_type);
         items.push({
-          type: 'client',
-          id: c.id,
-          name: c.store_name,
-          sub: `${c.store_type ? (CRM.STORE_TYPES.find(t => t.value === c.store_type)?.label || '') : ''}${biz ? '・' + biz.label : ''}`,
-          status: '契約中',
-          statusBadge: 'active',
-          date: c.next_date,
-          action: c.next_action || '',
-          isOverdue: d < today,
+          type: 'client', id: c.id, name: c.store_name,
+          sub: `${c.store_type ? (getAllStoreTypes().find(t => t.value === c.store_type)?.label || '') : ''}${biz ? '・' + biz.label : ''}`,
+          status: '契約中', statusBadge: 'active',
+          date: c.next_date, action: c.next_action || '', isOverdue: d < today,
         });
       }
     });
 
-    // Sort: overdue first, then by date
     items.sort((a, b) => {
       if (a.isOverdue !== b.isOverdue) return a.isOverdue ? -1 : 1;
       return new Date(a.date) - new Date(b.date);
     });
-
     return items;
   },
 
@@ -595,36 +546,29 @@ const Store = {
   },
 
   resetAll() {
-    Object.values(this.KEYS).forEach(key => localStorage.removeItem(key));
-    this._cache = {};
+    Repository.resetAll();
     this._seed();
-    localStorage.setItem(this.KEYS.initialized, 'true');
+    Repository.markInitialized();
   },
 
   // ============================================
   // Seed Data
   // ============================================
   _seed() {
-    // Reset counters
-    localStorage.setItem(this.KEYS.counters, JSON.stringify({
+    Repository.saveCountersSync({
       lead: 0, client: 3, task: 0, activity: 6
-    }));
+    });
 
-    // --- Leads (empty — real data entered by user) ---
     this._saveAll('leads', []);
 
-    // --- Clients ---
     const clients = [
       { id: 'client_0001', store_name: 'ふららぼ', company_name: '株式会社SRC', business_type: 'sns', store_type: 'concept-cafe', contact_name: 'SRC担当', contact_phone: '03-0000-0000', contact_email: 'info@src.co.jp', contact_line: '', sns_instagram: '@furarabo', sns_tiktok: '@furarabo', plan: 'regular', monthly_fee: 300000, contract_start: '2025-09-01', contract_end: '', status: 'active', next_date: '2026-03-01', next_action: '月次MTG実施', notes: '', assigned_to: 'ueda', area: '', converted_from_lead: null, created_at: '2025-09-01T00:00:00.000Z', updated_at: '2026-02-25T14:00:00.000Z' },
       { id: 'client_0002', store_name: 'さいたまブロンコス', company_name: 'OMGスポンサー', business_type: 'sns', store_type: 'other', contact_name: '', contact_phone: '', contact_email: '', contact_line: '', sns_instagram: '', sns_tiktok: '', plan: 'light', monthly_fee: 150000, contract_start: '2025-11-01', contract_end: '', status: 'active', next_date: '2026-03-05', next_action: '3月撮影スケジュール確認', notes: '', assigned_to: 'ueda', area: '', converted_from_lead: null, created_at: '2025-11-01T00:00:00.000Z', updated_at: '2026-02-23T09:00:00.000Z' },
       { id: 'client_0003', store_name: 'Roen', company_name: '', business_type: 'sns', store_type: 'other', contact_name: '', contact_phone: '', contact_email: '', contact_line: '', sns_instagram: '', sns_tiktok: '', plan: 'light', monthly_fee: 150000, contract_start: '2026-01-15', contract_end: '', status: 'active', next_date: '2026-03-10', next_action: '企画確認', notes: '', assigned_to: 'ueda', area: '', converted_from_lead: null, created_at: '2026-01-15T00:00:00.000Z', updated_at: '2026-02-20T10:00:00.000Z' },
     ];
     this._saveAll('clients', clients);
-
-    // --- Tasks (empty — real tasks entered by user) ---
     this._saveAll('tasks', []);
 
-    // --- Activities (real client history only) ---
     const activities = [
       { id: 'activity_0001', entity_type: 'client', entity_id: 'client_0001', activity_type: 'meeting', summary: '撮影日程の調整MTG。3/5に撮影確定。3月の企画案も共有済み。', next_date: '2026-03-01', next_action: '月次MTG', created_by: 'ueda', created_at: '2026-02-25T14:00:00.000Z' },
       { id: 'activity_0002', entity_type: 'client', entity_id: 'client_0001', activity_type: 'note', summary: '2月分の撮影完了（8本）。栗原さんに編集依頼済み。', next_date: '', next_action: '', created_by: 'ueda', created_at: '2026-02-15T00:00:00.000Z' },

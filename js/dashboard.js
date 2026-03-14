@@ -222,7 +222,7 @@ function openNewLeadFromDashboard() {
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
       ${formGroup('事業種別', formSelect('business_type', CRM.BUSINESS_TYPES))}
-      ${formGroup('業種', formSelect('store_type', [{ value: '', label: '選択してください' }, ...CRM.STORE_TYPES]))}
+      ${formGroup('業種', formSelect('store_type', [{ value: '', label: '選択してください' }, ...getAllStoreTypes()]))}
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
       ${formGroup('担当者名', formInput('contact_name', '例: 山田太郎'))}
@@ -237,8 +237,8 @@ function openNewLeadFromDashboard() {
       ${formGroup('TikTok', formInput('sns_tiktok', '例: @bar.nocturne'))}
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
-      ${formGroup('ソース', formSelect('source', CRM.SOURCES))}
-      ${formGroup('見込みプラン', formSelect('estimated_plan', [{ value: '', label: '未定' }, ...CRM.PLANS.map(p => ({ value: p.value, label: p.label + (p.fee ? ' (' + formatCurrency(p.fee) + ')' : '') }))]))}
+      ${formGroup('ソース', formSelect('source', getAllSources()))}
+      ${formGroup('見込みプラン', formSelect('estimated_plan', [{ value: '', label: '未定' }, ...getAllPlans().map(p => ({ value: p.value, label: p.label + (p.fee ? ' (' + formatCurrency(p.fee) + ')' : '') }))]))}
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
       ${formGroup('エリア', formInput('area', '例: 渋谷、六本木'))}
@@ -261,7 +261,7 @@ function openNewLeadFromDashboard() {
 
       // Resolve estimated_fee from the selected plan
       if (data.estimated_plan) {
-        const plan = CRM.PLANS.find(p => p.value === data.estimated_plan);
+        const plan = getAllPlans().find(p => p.value === data.estimated_plan);
         if (plan && plan.fee) data.estimated_fee = plan.fee;
       }
 
@@ -277,13 +277,8 @@ function openNewLeadFromDashboard() {
   });
 }
 
-// --- Escape HTML ---
-function esc(str) {
-  if (!str) return '';
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
-}
+// esc(): alias for escapeHtml (defined in ui.js)
+function esc(str) { return escapeHtml(str); }
 
 
 // ============================================
@@ -358,7 +353,7 @@ function renderRevenueChart() {
   // Group by plan
   const planMap = {};
   clients.forEach(c => {
-    const plan = CRM.PLANS.find(p => p.value === c.plan);
+    const plan = getAllPlans().find(p => p.value === c.plan);
     const label = plan ? plan.label : 'その他';
     planMap[label] = (planMap[label] || 0) + (c.monthly_fee || 0);
   });
@@ -414,7 +409,7 @@ function renderKpiTable() {
 
   const leads = Store.getLeads();
   const clients = Store.getClients();
-  const allAssignees = CRM.ASSIGNEES;
+  const allAssignees = getAllAssignees();
 
   const kpiRows = allAssignees.map(a => {
     const myLeads = leads.filter(l => l.assigned_to === a.value);

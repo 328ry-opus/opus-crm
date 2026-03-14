@@ -104,7 +104,7 @@ function showToast(message, type = 'success') {
 
   // Build content with icon
   const icon = TOAST_ICONS[type] || TOAST_ICONS.success;
-  toastEl.innerHTML = icon + '<span>' + message + '</span>';
+  toastEl.innerHTML = icon + '<span>' + escapeHtml(message) + '</span>';
   toastEl.className = 'toast';
   if (type === 'error') toastEl.classList.add('toast--error');
   if (type === 'success') toastEl.classList.add('toast--success');
@@ -133,7 +133,7 @@ function openModal(options) {
   overlay.innerHTML = `
     <div class="modal" style="max-width:${maxWidth}">
       <div class="modal__header">
-        <h2 class="modal__title">${options.title}</h2>
+        <h2 class="modal__title">${escapeHtml(options.title)}</h2>
         <button class="modal__close" data-action="close-modal">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
@@ -141,7 +141,7 @@ function openModal(options) {
       <div class="modal__body">${options.body}</div>
       <div class="modal__footer">
         <button class="btn btn--secondary" data-action="close-modal">キャンセル</button>
-        <button class="btn btn--primary" data-action="submit-modal">${options.submitLabel || '保存'}</button>
+        <button class="btn btn--primary" data-action="submit-modal">${escapeHtml(options.submitLabel || '保存')}</button>
       </div>
     </div>
   `;
@@ -210,26 +210,26 @@ function closeModal() {
 function formGroup(label, inputHtml, hint) {
   return `
     <div class="form-group">
-      <label class="form-label">${label}</label>
+      <label class="form-label">${escapeHtml(label)}</label>
       ${inputHtml}
-      ${hint ? `<div class="form-hint">${hint}</div>` : ''}
+      ${hint ? `<div class="form-hint">${escapeHtml(hint)}</div>` : ''}
     </div>
   `;
 }
 
 function formInput(name, placeholder, type = 'text', value = '') {
-  return `<input type="${type}" name="${name}" class="form-input" placeholder="${placeholder}" value="${value}">`;
+  return `<input type="${type}" name="${escapeHtml(name)}" class="form-input" placeholder="${escapeHtml(placeholder)}" value="${escapeHtml(value)}">`;
 }
 
 function formSelect(name, options, selected = '') {
   const opts = options.map(o =>
-    `<option value="${o.value}" ${o.value === selected ? 'selected' : ''}>${o.label}</option>`
+    `<option value="${escapeHtml(o.value)}" ${o.value === selected ? 'selected' : ''}>${escapeHtml(o.label)}</option>`
   ).join('');
-  return `<select name="${name}" class="form-input">${opts}</select>`;
+  return `<select name="${escapeHtml(name)}" class="form-input">${opts}</select>`;
 }
 
 function formTextarea(name, placeholder, value = '') {
-  return `<textarea name="${name}" class="form-input" placeholder="${placeholder}">${value}</textarea>`;
+  return `<textarea name="${escapeHtml(name)}" class="form-input" placeholder="${escapeHtml(placeholder)}">${escapeHtml(value)}</textarea>`;
 }
 
 function getFormData(container) {
@@ -271,6 +271,14 @@ function initDropdowns() {
   });
 }
 
+// --- Escape HTML (XSS prevention, shared across all pages) ---
+function escapeHtml(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 // --- Init all shared UI ---
 function initUI() {
   initSidebar();
@@ -278,5 +286,56 @@ function initUI() {
   initDropdowns();
 }
 
+// --- Service Worker update notification ---
+function initSwUpdate() {
+  if (!('serviceWorker' in navigator)) return;
+
+  navigator.serviceWorker.addEventListener('message', (e) => {
+    if (e.data && e.data.type === 'SW_UPDATED') {
+      showUpdateBanner();
+    }
+  });
+
+  // Also check for waiting SW on page load
+  navigator.serviceWorker.ready.then(reg => {
+    if (reg.waiting) showUpdateBanner();
+    reg.addEventListener('updatefound', () => {
+      const newSw = reg.installing;
+      if (!newSw) return;
+      newSw.addEventListener('statechange', () => {
+        if (newSw.state === 'installed' && navigator.serviceWorker.controller) {
+          showUpdateBanner();
+        }
+      });
+    });
+  });
+}
+
+function showUpdateBanner() {
+  if (document.getElementById('swUpdateBanner')) return;
+  const banner = document.createElement('div');
+  banner.id = 'swUpdateBanner';
+  banner.style.cssText = 'position:fixed;bottom:var(--space-4);left:50%;transform:translateX(-50%);background:var(--color-primary);color:#fff;padding:var(--space-3) var(--space-5);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);z-index:9999;display:flex;align-items:center;gap:var(--space-3);font-size:var(--text-sm);';
+  banner.innerHTML = `
+    <span>新しいバージョンがあります</span>
+    <button id="swUpdateBtn" style="background:#fff;color:var(--color-primary);border:none;padding:var(--space-1) var(--space-3);border-radius:var(--radius-md);cursor:pointer;font-weight:600;font-size:var(--text-xs);">更新</button>
+  `;
+  document.body.appendChild(banner);
+
+  // Send SKIP_WAITING to waiting SW, then reload
+  document.getElementById('swUpdateBtn').addEventListener('click', () => {
+    navigator.serviceWorker.getRegistration().then(reg => {
+      if (reg && reg.waiting) {
+        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }
+      // Reload after a short delay to let SW activate
+      setTimeout(() => location.reload(), 300);
+    });
+  });
+}
+
 // Auto-init on DOM ready
-document.addEventListener('DOMContentLoaded', initUI);
+document.addEventListener('DOMContentLoaded', () => {
+  initUI();
+  initSwUpdate();
+});

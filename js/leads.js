@@ -37,18 +37,18 @@ function initFilters() {
 
   // Build filter selects dynamically
   const businessOpts = [{ value: '', label: 'すべての事業' }, ...CRM.BUSINESS_TYPES];
-  const sourceOpts = [{ value: '', label: 'すべてのソース' }, ...CRM.SOURCES];
-  const storeTypeOpts = [{ value: '', label: 'すべての業種' }, ...CRM.STORE_TYPES];
+  const sourceOpts = [{ value: '', label: 'すべてのソース' }, ...getAllSources()];
+  const storeTypeOpts = [{ value: '', label: 'すべての業種' }, ...getAllStoreTypes()];
 
   filtersContainer.innerHTML = `
     <select class="filter-select" data-filter="business_type">
-      ${businessOpts.map(o => `<option value="${o.value}">${o.label}</option>`).join('')}
+      ${businessOpts.map(o => `<option value="${escapeHtml(o.value)}">${escapeHtml(o.label)}</option>`).join('')}
     </select>
     <select class="filter-select" data-filter="source">
-      ${sourceOpts.map(o => `<option value="${o.value}">${o.label}</option>`).join('')}
+      ${sourceOpts.map(o => `<option value="${escapeHtml(o.value)}">${escapeHtml(o.label)}</option>`).join('')}
     </select>
     <select class="filter-select" data-filter="store_type">
-      ${storeTypeOpts.map(o => `<option value="${o.value}">${o.label}</option>`).join('')}
+      ${storeTypeOpts.map(o => `<option value="${escapeHtml(o.value)}">${escapeHtml(o.label)}</option>`).join('')}
     </select>
     <div class="filters__spacer"></div>
     <input type="text" class="filter-search" placeholder="リードを検索..." data-filter="search">
@@ -133,7 +133,7 @@ function renderPipeline() {
 }
 
 function buildCardHTML(lead) {
-  const storeType = CRM.STORE_TYPES.find(t => t.value === lead.store_type);
+  const storeType = getAllStoreTypes().find(t => t.value === lead.store_type);
   const businessType = CRM.BUSINESS_TYPES.find(t => t.value === lead.business_type);
   const storeTypeLabel = storeType ? storeType.label : '';
   const businessLabel = businessType ? businessType.label : '';
@@ -342,7 +342,7 @@ function openNewLeadModal(defaultStage) {
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
       ${formGroup('\u4E8B\u696D\u7A2E\u5225', formSelect('business_type', CRM.BUSINESS_TYPES))}
-      ${formGroup('\u696D\u7A2E', formSelect('store_type', [{ value: '', label: '\u9078\u629E\u3057\u3066\u304F\u3060\u3055\u3044' }, ...CRM.STORE_TYPES]))}
+      ${formGroup('\u696D\u7A2E', formSelect('store_type', [{ value: '', label: '\u9078\u629E\u3057\u3066\u304F\u3060\u3055\u3044' }, ...getAllStoreTypes()]))}
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
       ${formGroup('\u62C5\u5F53\u8005\u540D', formInput('contact_name', '\u4F8B: \u5C71\u7530\u592A\u90CE'))}
@@ -357,8 +357,8 @@ function openNewLeadModal(defaultStage) {
       ${formGroup('TikTok', formInput('sns_tiktok', '\u4F8B: @bar.nocturne'))}
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
-      ${formGroup('\u30BD\u30FC\u30B9', formSelect('source', CRM.SOURCES))}
-      ${formGroup('\u898B\u8FBC\u307F\u30D7\u30E9\u30F3', formSelect('estimated_plan', [{ value: '', label: '\u672A\u5B9A' }, ...CRM.PLANS.map(p => ({ value: p.value, label: p.label + (p.fee ? ` (${formatCurrency(p.fee)})` : '') }))]))}
+      ${formGroup('\u30BD\u30FC\u30B9', formSelect('source', getAllSources()))}
+      ${formGroup('\u898B\u8FBC\u307F\u30D7\u30E9\u30F3', formSelect('estimated_plan', [{ value: '', label: '\u672A\u5B9A' }, ...getAllPlans().map(p => ({ value: p.value, label: p.label + (p.fee ? ` (${formatCurrency(p.fee)})` : '') }))]))}
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 var(--space-4);">
       ${formGroup('\u30A8\u30EA\u30A2', formInput('area', '\u4F8B: \u6E0B\u8C37\u3001\u516D\u672C\u6728'))}
@@ -381,7 +381,7 @@ function openNewLeadModal(defaultStage) {
 
       // Resolve estimated_fee from the selected plan
       if (data.estimated_plan) {
-        const plan = CRM.PLANS.find(p => p.value === data.estimated_plan);
+        const plan = getAllPlans().find(p => p.value === data.estimated_plan);
         if (plan && plan.fee) {
           data.estimated_fee = plan.fee;
         }
@@ -463,10 +463,10 @@ function showTableView() {
 }
 
 function buildTableRow(lead) {
-  const storeType = CRM.STORE_TYPES.find(t => t.value === lead.store_type);
+  const storeType = getAllStoreTypes().find(t => t.value === lead.store_type);
   const businessType = CRM.BUSINESS_TYPES.find(t => t.value === lead.business_type);
   const stage = CRM.LEAD_STAGES.find(s => s.value === lead.stage);
-  const source = CRM.SOURCES.find(s => s.value === lead.source);
+  const source = getAllSources().find(s => s.value === lead.source);
 
   const storeTypeLabel = storeType ? storeType.label : '';
   const areaStr = lead.area ? `\u30FB${escapeHTML(lead.area)}` : '';
@@ -651,9 +651,5 @@ function handleBulkDelete() {
 // ============================================
 // Utility
 // ============================================
-function escapeHTML(str) {
-  if (!str) return '';
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
-}
+// escapeHTML: alias for escapeHtml (defined in ui.js)
+function escapeHTML(str) { return escapeHtml(str); }

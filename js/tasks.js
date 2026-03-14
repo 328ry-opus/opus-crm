@@ -155,7 +155,7 @@ function buildTaskCard(task) {
   const priority = CRM.PRIORITIES.find(p => p.value === task.priority) || CRM.PRIORITIES[1];
 
   // Assignee info
-  const assignee = CRM.ASSIGNEES.find(a => a.value === task.assigned_to);
+  const assignee = getAllAssignees().find(a => a.value === task.assigned_to);
 
   // Date display
   let dateHtml = '';
@@ -184,10 +184,10 @@ function buildTaskCard(task) {
     : '';
 
   card.innerHTML = `
-    <div class="task-kanban-card__title">${task.title}</div>
+    <div class="task-kanban-card__title">${escapeHtml(task.title)}</div>
     ${entityName ? `<div class="task-kanban-card__client">
       ${isLead ? leadIcon : clientIcon}
-      ${entityName}
+      ${escapeHtml(entityName)}
     </div>` : ''}
     <div class="task-kanban-card__footer">
       ${dateHtml}
@@ -364,7 +364,7 @@ function initTaskFilters() {
   const assigneeSelect = document.createElement('select');
   assigneeSelect.className = 'filter-select';
   assigneeSelect.innerHTML = `<option value="">すべての担当者</option>` +
-    CRM.ASSIGNEES.map(a => `<option value="${a.value}">${a.label}</option>`).join('');
+    getAllAssignees().map(a => `<option value="${escapeHtml(a.value)}">${escapeHtml(a.label)}</option>`).join('');
   assigneeSelect.addEventListener('change', () => {
     currentFilters.assigned_to = assigneeSelect.value;
     renderTasks();
@@ -408,7 +408,7 @@ function buildClientFilterOptions() {
   // Active clients
   const clients = Store.getClients();
   clients.forEach(c => {
-    html += `<option value="${c.id}">${c.store_name}</option>`;
+    html += `<option value="${c.id}">${escapeHtml(c.store_name)}</option>`;
   });
 
   // Leads that have tasks (avoid duplicates with clients)
@@ -417,7 +417,7 @@ function buildClientFilterOptions() {
   leadIds.forEach(lid => {
     const lead = Store.getLead(lid);
     if (lead) {
-      html += `<option value="${lid}">${lead.store_name}（リード）</option>`;
+      html += `<option value="${lid}">${escapeHtml(lead.store_name)}（リード）</option>`;
     }
   });
 
@@ -451,7 +451,7 @@ function openNewTaskModal() {
       ${formGroup('期限', formInput('due_date', '', 'date'))}
       ${formGroup('優先度', formSelect('priority', CRM.PRIORITIES, 'medium'))}
     </div>
-    ${formGroup('担当者', formSelect('assigned_to', [{ value: '', label: '未割当' }, ...CRM.ASSIGNEES.map(a => ({ value: a.value, label: a.label }))]))}
+    ${formGroup('担当者', formSelect('assigned_to', [{ value: '', label: '未割当' }, ...getAllAssignees().map(a => ({ value: a.value, label: a.label }))]))}
     ${formGroup('メモ', formTextarea('notes', 'タスクの詳細を入力...'))}
   `;
 
@@ -520,7 +520,7 @@ function openEditTaskModal(taskId) {
       ${formGroup('期限', formInput('due_date', '', 'date', task.due_date || ''))}
       ${formGroup('完了日', formInput('completed_date', '', 'date', task.completed_date || ''))}
     </div>
-    ${formGroup('担当者', formSelect('assigned_to', [{ value: '', label: '未割当' }, ...CRM.ASSIGNEES.map(a => ({ value: a.value, label: a.label }))], task.assigned_to))}
+    ${formGroup('担当者', formSelect('assigned_to', [{ value: '', label: '未割当' }, ...getAllAssignees().map(a => ({ value: a.value, label: a.label }))], task.assigned_to))}
     ${formGroup('メモ', formTextarea('notes', 'タスクの詳細を入力...', task.notes || ''))}
     <div style="margin-top:var(--space-4); padding-top:var(--space-4); border-top:1px solid var(--color-border);">
       <button class="btn btn--danger btn--sm" data-action="delete-task" style="width:100%;">

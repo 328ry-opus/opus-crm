@@ -95,12 +95,12 @@ function renderPlans() {
   const tbody = document.getElementById('planTableBody');
   if (!tbody) return;
 
-  const allPlans = [...CRM.PLANS, ...getCustomItems('custom_plans')];
+  const allPlans = getAllPlans();
   tbody.innerHTML = allPlans.map((plan, i) => {
     const isCustom = i >= CRM.PLANS.length;
     return `
     <tr>
-      <td style="font-weight:var(--font-medium)">${plan.label}</td>
+      <td style="font-weight:var(--font-medium)">${escapeHtml(plan.label)}</td>
       <td class="plan-table__fee">${plan.fee ? formatCurrency(plan.fee) + '/月' : '従量制'}</td>
       <td style="text-align:right">
         ${isCustom ? `<button class="btn btn--ghost btn--sm" data-remove-custom="custom_plans" data-remove-index="${i - CRM.PLANS.length}">削除</button>` : ''}
@@ -119,10 +119,10 @@ function renderStoreTypes() {
   const container = document.getElementById('storeTypes');
   if (!container) return;
 
-  const allTypes = [...CRM.STORE_TYPES, ...getCustomItems('custom_store_types')];
+  const allTypes = getAllStoreTypes();
   container.innerHTML = allTypes.map((t, i) => {
     const isCustom = i >= CRM.STORE_TYPES.length;
-    return `<div class="tag-item">${t.label}${isCustom ? `<button class="tag-item__remove" data-remove-custom="custom_store_types" data-remove-index="${i - CRM.STORE_TYPES.length}">&times;</button>` : ''}</div>`;
+    return `<div class="tag-item">${escapeHtml(t.label)}${isCustom ? `<button class="tag-item__remove" data-remove-custom="custom_store_types" data-remove-index="${i - CRM.STORE_TYPES.length}">&times;</button>` : ''}</div>`;
   }).join('');
 
   container.querySelectorAll('[data-remove-custom]').forEach(btn => {
@@ -135,10 +135,10 @@ function renderSourceTypes() {
   const container = document.getElementById('sourceTypes');
   if (!container) return;
 
-  const allSources = [...CRM.SOURCES, ...getCustomItems('custom_sources')];
+  const allSources = getAllSources();
   container.innerHTML = allSources.map((s, i) => {
     const isCustom = i >= CRM.SOURCES.length;
-    return `<div class="tag-item">${s.label}${isCustom ? `<button class="tag-item__remove" data-remove-custom="custom_sources" data-remove-index="${i - CRM.SOURCES.length}">&times;</button>` : ''}</div>`;
+    return `<div class="tag-item">${escapeHtml(s.label)}${isCustom ? `<button class="tag-item__remove" data-remove-custom="custom_sources" data-remove-index="${i - CRM.SOURCES.length}">&times;</button>` : ''}</div>`;
   }).join('');
 
   container.querySelectorAll('[data-remove-custom]').forEach(btn => {
@@ -184,8 +184,8 @@ function renderTeamMembers() {
       <div class="member-item">
         <div class="member-avatar member-avatar--${m.color}">${initial}</div>
         <div class="member-info">
-          <div class="member-name">${m.name}</div>
-          <div class="member-role">${roleLabel}${area}</div>
+          <div class="member-name">${escapeHtml(m.name)}</div>
+          <div class="member-role">${escapeHtml(roleLabel)}${escapeHtml(area)}</div>
         </div>
         <div class="member-actions">
           ${m.isOwner ? '<span class="badge badge--primary">自分</span>' : isCustom ? `<button class="btn btn--ghost btn--sm" data-remove-member="${i - builtIn.length}">削除</button>` : ''}
@@ -480,11 +480,11 @@ function showCsvPreview(headers, rows) {
   // Build mapping selects
   const mappingHtml = headers.map((h, i) => {
     const options = fieldOptions.map(f =>
-      `<option value="${f.value}"${autoMap[i] === f.value ? ' selected' : ''}>${f.label}</option>`
+      `<option value="${escapeHtml(f.value)}"${autoMap[i] === f.value ? ' selected' : ''}>${escapeHtml(f.label)}</option>`
     ).join('');
     return `
       <div style="display:flex; align-items:center; gap:var(--space-3); padding:var(--space-2) 0; border-bottom:1px solid var(--color-border);">
-        <span style="flex:1; font-size:var(--text-sm); font-weight:var(--font-medium); color:var(--color-text-secondary);">${h}</span>
+        <span style="flex:1; font-size:var(--text-sm); font-weight:var(--font-medium); color:var(--color-text-secondary);">${escapeHtml(h)}</span>
         <span style="color:var(--color-text-tertiary);">→</span>
         <select class="form-input csv-mapping" data-col="${i}" style="flex:1; font-size:var(--text-xs);">${options}</select>
       </div>
@@ -493,7 +493,7 @@ function showCsvPreview(headers, rows) {
 
   // Preview first 3 rows
   const previewRows = rows.slice(0, 3).map(row =>
-    `<tr>${row.map(cell => `<td style="font-size:var(--text-xs); padding:var(--space-1) var(--space-2); max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${cell}</td>`).join('')}</tr>`
+    `<tr>${row.map(cell => `<td style="font-size:var(--text-xs); padding:var(--space-1) var(--space-2); max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(cell)}</td>`).join('')}</tr>`
   ).join('');
 
   preview.innerHTML = `
@@ -507,7 +507,7 @@ function showCsvPreview(headers, rows) {
       <div style="font-size:var(--text-xs); color:var(--color-text-tertiary); margin-bottom:var(--space-2);">プレビュー（最初の3行）</div>
       <div style="overflow-x:auto;">
         <table class="data-table" style="font-size:var(--text-xs);">
-          <thead><tr>${headers.map(h => `<th style="padding:var(--space-1) var(--space-2); white-space:nowrap;">${h}</th>`).join('')}</tr></thead>
+          <thead><tr>${headers.map(h => `<th style="padding:var(--space-1) var(--space-2); white-space:nowrap;">${escapeHtml(h)}</th>`).join('')}</tr></thead>
           <tbody>${previewRows}</tbody>
         </table>
       </div>
@@ -627,12 +627,12 @@ function initJsonImport() {
           return;
         }
 
-        // Restore each data type
-        if (data.leads) localStorage.setItem(Store.KEYS.leads, JSON.stringify(data.leads));
-        if (data.clients) localStorage.setItem(Store.KEYS.clients, JSON.stringify(data.clients));
-        if (data.tasks) localStorage.setItem(Store.KEYS.tasks, JSON.stringify(data.tasks));
-        if (data.activities) localStorage.setItem(Store.KEYS.activities, JSON.stringify(data.activities));
-        if (data.settings) localStorage.setItem(Store.KEYS.settings, JSON.stringify(data.settings));
+        // Restore each data type via Repository
+        if (data.leads) Repository.saveAllSync('leads', data.leads);
+        if (data.clients) Repository.saveAllSync('clients', data.clients);
+        if (data.tasks) Repository.saveAllSync('tasks', data.tasks);
+        if (data.activities) Repository.saveAllSync('activities', data.activities);
+        if (data.settings) Repository.saveSettingsSync(data.settings);
 
         // Recalculate counters from restored data
         const counters = {};
@@ -640,10 +640,10 @@ function initJsonImport() {
         if (data.clients) counters.client = Math.max(...data.clients.map(c => parseInt(c.id.split('_')[1]) || 0), 0);
         if (data.tasks) counters.task = Math.max(...data.tasks.map(t => parseInt(t.id.split('_')[1]) || 0), 0);
         if (data.activities) counters.activity = Math.max(...data.activities.map(a => parseInt(a.id.split('_')[1]) || 0), 0);
-        localStorage.setItem(Store.KEYS.counters, JSON.stringify(counters));
+        Repository.saveCountersSync(counters);
 
         // Clear cache
-        Store._cache = {};
+        Repository.clearCache();
 
         fileInput.value = '';
         showToast('バックアップから復元しました。ページを再読込します...');

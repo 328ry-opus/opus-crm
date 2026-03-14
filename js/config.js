@@ -131,3 +131,32 @@ function formatCurrency(amount) {
   if (!amount) return '';
   return '¥' + amount.toLocaleString();
 }
+
+// --- Custom item helpers (merge built-in + user-added from Settings) ---
+function _getCustom(key) {
+  if (typeof Store === 'undefined') return [];
+  const settings = Store.getSettings();
+  return settings[key] || [];
+}
+
+function getAllPlans() {
+  return [...CRM.PLANS, ..._getCustom('custom_plans')];
+}
+
+function getAllStoreTypes() {
+  return [...CRM.STORE_TYPES, ..._getCustom('custom_store_types')];
+}
+
+function getAllSources() {
+  return [...CRM.SOURCES, ..._getCustom('custom_sources')];
+}
+
+function getAllAssignees() {
+  const custom = _getCustom('custom_members');
+  const extras = custom.map(m => ({
+    value: m.name.toLowerCase().replace(/\s+/g, '_'),
+    label: m.name,
+    initial: m.name.charAt(0),
+  }));
+  return [...CRM.ASSIGNEES, ...extras];
+}
